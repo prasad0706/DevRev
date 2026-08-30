@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Home, Code, CheckCircle, User, LogIn, X } from 'lucide-react';
+import { Search, Home, Code, User, LogIn, X } from 'lucide-react';
 
 export default function CommandPalette({ isOpen, onClose, onNavigate }) {
   const [query, setQuery] = useState('');
@@ -10,7 +10,6 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }) {
         e.preventDefault();
         if (isOpen) onClose();
         else {
-          // Trigger open via parent if needed
         }
       }
       if (e.key === 'Escape' && isOpen) {

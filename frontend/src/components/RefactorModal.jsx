@@ -20,7 +20,6 @@ export default function RefactorModal({ isOpen, onClose, lineNumber, onSubmitRef
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="bg-[#151517] border border-[#242427] rounded-xl w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-        {/* Modal Header */}
         <div className="bg-[#0E0E10] border-b border-[#242427] px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 text-[#E8E8EA] font-semibold text-xs">
             <Code2 size={16} className="text-[#4F9CF9]" />
@@ -31,7 +30,6 @@ export default function RefactorModal({ isOpen, onClose, lineNumber, onSubmitRef
           </button>
         </div>
 
-        {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-4 space-y-3 text-xs">
           <div>
             <label className="block text-xs font-medium text-[#8A8A8E] mb-1">
@@ -59,8 +57,6 @@ export default function RefactorModal({ isOpen, onClose, lineNumber, onSubmitRef
               className="w-full bg-[#0E0E10] border border-[#242427] rounded-lg p-2.5 text-xs font-mono text-[#4CAF6D] placeholder-[#5A5A5E] outline-none focus:border-[#4CAF6D]"
             />
           </div>
-
-          {/* Action Buttons */}
           <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#242427]">
             <button
               type="button"

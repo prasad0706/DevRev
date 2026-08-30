@@ -1,14 +1,30 @@
-import React, { useState } from 'react';
-import { Award, Code, CheckCircle2, TrendingUp, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import { UserContext } from '../context/UserContext';
+import { Award, Code, CheckCircle2, TrendingUp, Sparkles, Shield, UserCheck, RefreshCw } from 'lucide-react';
 
 export default function DashboardPage({ onNavigate }) {
+  // 1. Access shared context data using useContext() - No prop drilling needed
+  const { user, switchRole, addKarma, toggleModMode } = useContext(UserContext);
+
   const [activeTab, setActiveTab] = useState('activity');
+  const [effectMessage, setEffectMessage] = useState('');
+
+  // 2. useEffect() Demonstration 1: Runs once when component loads (empty dependency array [])
+  useEffect(() => {
+    console.log(`[useEffect - Mount] Dashboard loaded for ${user.username}`);
+    setEffectMessage('Dashboard initialized via useEffect on mount []');
+  }, []);
+
+  // 3. useEffect() Demonstration 2: Runs whenever user.karma changes ([user.karma])
+  useEffect(() => {
+    console.log(`[useEffect - Dependency] Karma updated to ${user.karma}`);
+  }, [user.karma]);
 
   const karmaBreakdown = {
-    total: 340,
-    acceptedRefactors: 180,
+    total: user.karma,
+    acceptedRefactors: user.acceptedRefactors * 25,
     upvotesReceived: 110,
-    helpfulComments: 50,
+    helpfulComments: 30,
   };
 
   const timelineEvents = [
@@ -28,49 +44,105 @@ export default function DashboardPage({ onNavigate }) {
     },
     {
       id: 3,
-      title: 'Unlocked Badge: Verified Code Reviewer',
-      detail: 'Earned 300+ Karma milestones.',
-      karma: 'Badge Unlocked',
-      time: '1d ago',
+      title: `Current Active Role: ${user.role}`,
+      detail: `Role privileges managed through UserContext.`,
+      karma: 'RBAC Active',
+      time: 'Live',
     },
   ];
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
-      {/* Profile Header & Instagram-style Consolidated Stat Bar */}
+      {/* Experiment 2 Demo Notice Box */}
+      <div className="bg-[#151517] border border-[#242427] rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+        <div>
+          <span className="text-[#4F9CF9] font-semibold block">
+            React Hooks Experiment 2: useContext & useEffect
+          </span>
+          <span className="text-[#8A8A8E]">
+            Welcome, <strong className="text-[#E8E8EA]">{user.name}</strong> · Role:{' '}
+            <strong className="text-[#4CAF6D]">{user.role}</strong>
+          </span>
+        </div>
+
+        {/* Role Switcher to demonstrate live context updates */}
+        <div className="flex items-center gap-1.5 bg-[#0E0E10] border border-[#242427] p-1 rounded-lg">
+          <button
+            onClick={() => switchRole('Student')}
+            className={`px-2 py-1 rounded text-[11px] transition ${
+              user.role === 'Student'
+                ? 'bg-[#4F9CF9] text-white font-medium'
+                : 'text-[#8A8A8E] hover:text-[#E8E8EA]'
+            }`}
+          >
+            Student
+          </button>
+          <button
+            onClick={() => switchRole('Verified Reviewer')}
+            className={`px-2 py-1 rounded text-[11px] transition ${
+              user.role === 'Verified Reviewer'
+                ? 'bg-[#4F9CF9] text-white font-medium'
+                : 'text-[#8A8A8E] hover:text-[#E8E8EA]'
+            }`}
+          >
+            Reviewer
+          </button>
+          <button
+            onClick={() => switchRole('Admin')}
+            className={`px-2 py-1 rounded text-[11px] transition ${
+              user.role === 'Admin'
+                ? 'bg-amber-600 text-white font-medium'
+                : 'text-[#8A8A8E] hover:text-[#E8E8EA]'
+            }`}
+          >
+            Admin
+          </button>
+        </div>
+      </div>
+
+      {/* Profile Header & Stat Bar */}
       <div className="bg-[#151517] border border-[#242427] rounded-xl p-6 space-y-6">
         <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-4 text-center sm:text-left">
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <div className="w-14 h-14 rounded-full bg-[#1C1C1F] border border-[#4F9CF9] flex items-center justify-center text-[#4F9CF9] font-bold text-xl shrink-0">
-              PM
+              {user.username.slice(0, 2).toUpperCase()}
             </div>
             <div>
               <div className="flex items-center justify-center sm:justify-start gap-2">
-                <h1 className="text-lg font-bold text-[#E8E8EA]">Prasad Mahajan</h1>
+                <h1 className="text-lg font-bold text-[#E8E8EA]">{user.name}</h1>
                 <span className="text-[10px] text-[#4F9CF9] bg-[#0E0E10] border border-[#242427] px-2 py-0.5 rounded font-mono font-medium">
-                  Verified Reviewer
+                  {user.role}
                 </span>
               </div>
               <p className="text-xs text-[#8A8A8E] mt-0.5">
-                @prasad_m · Full Stack Developer · Joined Aug 2026
+                @{user.username} · {user.email} · Joined Aug 2026
               </p>
             </div>
           </div>
 
-          <button
-            onClick={() => onNavigate('home')}
-            className="bg-[#1C1C1F] hover:bg-[#242427] text-[#E8E8EA] border border-[#242427] text-xs font-semibold px-3 py-1.5 rounded-lg transition"
-          >
-            Edit Profile
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => addKarma(10)}
+              className="bg-[#1C1C1F] hover:bg-[#242427] text-[#4F9CF9] border border-[#242427] text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5"
+              title="Demonstrates context state update triggering useEffect"
+            >
+              <RefreshCw size={13} /> +10 Karma
+            </button>
+            <button
+              onClick={() => onNavigate('home')}
+              className="bg-[#1C1C1F] hover:bg-[#242427] text-[#E8E8EA] border border-[#242427] text-xs font-semibold px-3 py-1.5 rounded-lg transition"
+            >
+              Back to Feed
+            </button>
+          </div>
         </div>
 
-        {/* Single Instagram-style Stat Bar (No separate boxes) */}
+        {/* Single Stat Bar */}
         <div className="grid grid-cols-4 divide-x divide-[#242427] bg-[#0E0E10] border border-[#242427] rounded-lg p-3 text-center">
           <div>
             <span className="text-[10px] text-[#8A8A8E] uppercase tracking-wider block">Karma</span>
             <span className="text-base font-bold text-[#4F9CF9] font-mono mt-0.5 block flex items-center justify-center gap-1">
-              <Award size={15} /> 340
+              <Award size={15} /> {user.karma}
             </span>
           </div>
 
@@ -81,7 +153,7 @@ export default function DashboardPage({ onNavigate }) {
 
           <div>
             <span className="text-[10px] text-[#8A8A8E] uppercase tracking-wider block">Refactors</span>
-            <span className="text-base font-bold text-[#4CAF6D] font-mono mt-0.5 block">8</span>
+            <span className="text-base font-bold text-[#4CAF6D] font-mono mt-0.5 block">{user.acceptedRefactors}</span>
           </div>
 
           <div>
@@ -91,7 +163,6 @@ export default function DashboardPage({ onNavigate }) {
         </div>
       </div>
 
-      {/* Gamification Karma Breakdown */}
       <div className="bg-[#151517] border border-[#242427] rounded-xl p-4 space-y-3">
         <h3 className="text-xs font-semibold text-[#E8E8EA] flex items-center gap-1.5">
           <Sparkles size={15} className="text-[#4F9CF9]" /> Karma Earning Breakdown
@@ -123,7 +194,6 @@ export default function DashboardPage({ onNavigate }) {
         </div>
       </div>
 
-      {/* Tab Navigation */}
       <div className="flex border-b border-[#242427] text-xs font-medium">
         <button
           onClick={() => setActiveTab('activity')}
@@ -147,7 +217,6 @@ export default function DashboardPage({ onNavigate }) {
         </button>
       </div>
 
-      {/* Activity Timeline Tab */}
       {activeTab === 'activity' && (
         <div className="bg-[#151517] border border-[#242427] rounded-xl p-5 space-y-4">
           <div className="relative pl-5 space-y-4 border-l border-[#242427]">
@@ -168,7 +237,6 @@ export default function DashboardPage({ onNavigate }) {
         </div>
       )}
 
-      {/* Snippet Submissions Tab */}
       {activeTab === 'submissions' && (
         <div className="bg-[#151517] border border-[#242427] rounded-xl overflow-hidden">
           <div className="overflow-x-auto">

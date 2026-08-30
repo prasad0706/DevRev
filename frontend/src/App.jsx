@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { UserProvider } from './context/UserContext';
+import { useDocumentTitle } from './hooks/useDocumentTitle';
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
 import AdminModBanner from './components/AdminModBanner';
 import CommandPalette from './components/CommandPalette';
 import ToastStack from './components/ToastStack';
 import RefactorModal from './components/RefactorModal';
-
 import HomePage from './pages/HomePage';
 import PostDetailPage from './pages/PostDetailPage';
 import LoginPage from './pages/LoginPage';
@@ -13,16 +13,29 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
 
-export default function App() {
+function AppContent() {
   const [activePage, setActivePage] = useState('home');
   const [targetPostId, setTargetPostId] = useState(1);
   const [targetUsername, setTargetUsername] = useState('alex_dev');
 
-  const [isModMode, setIsModMode] = useState(false);
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   const [isNewPostOpen, setIsNewPostOpen] = useState(false);
-
   const [toasts, setToasts] = useState([]);
+
+  // Use Custom Hook to update document title based on active page
+  useDocumentTitle(
+    activePage === 'home'
+      ? 'Feed Home'
+      : activePage === 'dashboard'
+      ? 'Developer Dashboard'
+      : activePage === 'post-detail'
+      ? 'Code Review Discussion'
+      : activePage === 'profile'
+      ? `@${targetUsername}'s Profile`
+      : activePage === 'login'
+      ? 'Sign In'
+      : 'Create Account'
+  );
 
   const addToast = ({ title, message, type = 'info' }) => {
     const id = Date.now();
@@ -45,27 +58,20 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#0E0E10] text-[#E8E8EA] flex flex-col font-sans selection:bg-[#4F9CF9] selection:text-white">
-      {/* Top Moderator Mode Banner */}
-      <AdminModBanner
-        isModMode={isModMode}
-        onToggleMod={() => setIsModMode(false)}
-      />
+      {/* Global Moderator Banner consuming UserContext */}
+      <AdminModBanner />
 
-      {/* Main Sticky Navbar */}
+      {/* Main Navbar consuming UserContext */}
       <Navbar
         onNavigate={handleNavigate}
         onOpenCommand={() => setIsCommandOpen(true)}
         onOpenNewPost={() => setIsNewPostOpen(true)}
-        isModMode={isModMode}
-        onToggleMod={() => setIsModMode(!isModMode)}
       />
 
-      {/* Main Page View Container */}
       <div className="flex-1">
         {activePage === 'home' && (
           <HomePage
             onNavigate={handleNavigate}
-            isModMode={isModMode}
             onShowToast={addToast}
           />
         )}
@@ -95,10 +101,6 @@ export default function App() {
         )}
       </div>
 
-      {/* Footer */}
-      <Footer />
-
-      {/* Interactive Overlays */}
       <CommandPalette
         isOpen={isCommandOpen}
         onClose={() => setIsCommandOpen(false)}
@@ -107,11 +109,10 @@ export default function App() {
 
       <ToastStack toasts={toasts} onDismiss={removeToast} />
 
-      {/* New Code Post Modal Trigger */}
       <RefactorModal
         isOpen={isNewPostOpen}
         onClose={() => setIsNewPostOpen(false)}
-        onSubmitRefactor={(data) => {
+        onSubmitRefactor={() => {
           addToast({
             title: 'Code Snippet Posted!',
             message: 'Your snippet is now live in the feed for peer review.',
@@ -120,5 +121,13 @@ export default function App() {
         }}
       />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <UserProvider>
+      <AppContent />
+    </UserProvider>
   );
 }

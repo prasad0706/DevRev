@@ -24,7 +24,6 @@ export default function CodeViewer({
 
   return (
     <div className="bg-[#0E0E10] border border-[#242427] rounded-lg overflow-hidden font-mono text-xs my-2">
-      {/* Code Bar Header */}
       <div className="bg-[#151517] border-b border-[#242427] px-3 py-1.5 flex items-center justify-between text-[#8A8A8E]">
         <span className="text-[11px] uppercase font-semibold text-[#8A8A8E] tracking-wider">
           {language}
@@ -49,7 +48,6 @@ export default function CodeViewer({
         </div>
       </div>
 
-      {/* Code Body */}
       <div className="p-2 overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <tbody>
@@ -60,7 +58,6 @@ export default function CodeViewer({
                   key={lineNum} 
                   className="hover:bg-[#1C1C1F] group transition-colors"
                 >
-                  {/* Line Number Column */}
                   <td className="w-9 select-none text-right pr-3 py-0.5 text-[#5A5A5E] group-hover:text-[#8A8A8E] border-r border-[#242427]/60">
                     <span className="group-hover:hidden">{lineNum}</span>
                     <button 
@@ -72,7 +69,6 @@ export default function CodeViewer({
                     </button>
                   </td>
 
-                  {/* Code Line Content */}
                   <td className="pl-3 py-0.5 text-[#E8E8EA] whitespace-pre">
                     {lineContent}
                   </td>

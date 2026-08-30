@@ -1,15 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { UserContext } from '../context/UserContext';
 import LeftSidebar from '../components/LeftSidebar';
 import RightSidebar from '../components/RightSidebar';
 import CodeViewer from '../components/CodeViewer';
 import UpvoteButton from '../components/UpvoteButton';
 import RefactorModal from '../components/RefactorModal';
-import { ArrowLeft, MessageSquare, CheckCircle2, GitPullRequest, Send } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, GitPullRequest, Send } from 'lucide-react';
 
 export default function PostDetailPage({ postId = 1, onNavigate, onShowToast }) {
+  // 1. Consume shared user context using useContext()
+  const { user, addKarma } = useContext(UserContext);
+
   const [isRefactorOpen, setIsRefactorOpen] = useState(false);
   const [selectedLine, setSelectedLine] = useState(null);
   const [newComment, setNewComment] = useState('');
+
+  // 2. useEffect() hook on component mount [postId] to simulate fetching post detail
+  useEffect(() => {
+    console.log(`[useEffect - Dependency] PostDetailPage loaded for Post ID: ${postId}`);
+  }, [postId]);
 
   const post = {
     id: postId,
@@ -35,7 +44,7 @@ export default function PostDetailPage({ postId = 1, onNavigate, onShowToast }) 
   return data;
 };`,
     upvotes: 42,
-    status: 'Open'
+    status: 'Open',
   };
 
   const [comments, setComments] = useState([
@@ -51,7 +60,7 @@ fetch(url, { signal: controller.signal })
 // ...
 return () => controller.abort();`,
       upvotes: 12,
-      isAccepted: true
+      isAccepted: true,
     },
     {
       id: 102,
@@ -61,43 +70,45 @@ return () => controller.abort();`,
       text: 'Make sure `url` is sanitized if passed from dynamic route params.',
       diff: null,
       upvotes: 3,
-      isAccepted: false
-    }
+      isAccepted: false,
+    },
   ]);
 
   const handleAddComment = (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
 
-    setComments(prev => [
-      ...prev,
-      {
-        id: Date.now(),
-        author: 'prasad_m',
-        time: 'Just now',
-        line: selectedLine || null,
-        text: newComment,
-        diff: null,
-        upvotes: 0,
-        isAccepted: false
-      }
-    ]);
+    const commentObj = {
+      id: Date.now(),
+      author: user.username,
+      time: 'Just now',
+      line: selectedLine || null,
+      text: newComment,
+      diff: null,
+      upvotes: 0,
+      isAccepted: false,
+    };
+
+    setComments((prev) => [...prev, commentObj]);
     setNewComment('');
+    addKarma(5); // Context action: award karma for submitting peer review
+
     if (onShowToast) {
-      onShowToast({ title: 'Comment Posted', message: 'Your review comment has been added.', type: 'success' });
+      onShowToast({
+        title: 'Comment Posted',
+        message: 'Your review comment has been added (+5 Karma).',
+        type: 'success',
+      });
     }
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 md:grid-cols-12 gap-6">
-      {/* Left Navigation */}
       <div className="hidden md:block md:col-span-3">
         <LeftSidebar activeTab="home" onSelectTab={() => onNavigate('home')} />
       </div>
 
-      {/* Main Post Detail */}
       <main className="col-span-1 md:col-span-6 space-y-4">
-        {/* Back Link */}
         <button
           onClick={() => onNavigate('home')}
           className="flex items-center gap-1.5 text-xs text-[#8A8A8E] hover:text-[#E8E8EA] transition font-medium"
@@ -105,7 +116,6 @@ return () => controller.abort();`,
           <ArrowLeft size={14} /> Back to feed
         </button>
 
-        {/* Post Container */}
         <article className="bg-[#151517] border border-[#242427] rounded-xl p-5 space-y-4">
           <div className="flex items-center justify-between text-xs text-[#8A8A8E]">
             <div className="flex items-center gap-1.5">
@@ -122,7 +132,6 @@ return () => controller.abort();`,
             {post.title}
           </h1>
 
-          {/* Code Viewer with Line Commenting Enabled */}
           <div>
             <div className="flex items-center justify-between text-[11px] text-[#8A8A8E] mb-1">
               <span>Click line number to suggest line-specific refactor</span>
@@ -138,7 +147,6 @@ return () => controller.abort();`,
             />
           </div>
 
-          {/* Footer Bar */}
           <div className="flex items-center justify-between text-xs pt-2 border-t border-[#242427]">
             <UpvoteButton initialVotes={post.upvotes} />
             <button
@@ -150,8 +158,16 @@ return () => controller.abort();`,
           </div>
         </article>
 
-        {/* Add Comment Input */}
+        {/* Comment input form */}
         <form onSubmit={handleAddComment} className="bg-[#151517] border border-[#242427] rounded-xl p-4 space-y-2">
+          <div className="flex items-center justify-between text-xs text-[#8A8A8E] mb-1">
+            <span>Commenting as <strong className="text-[#E8E8EA]">@{user.username}</strong></span>
+            {selectedLine && (
+              <span className="text-[#4F9CF9] font-mono text-[11px]">
+                Targeting Line {selectedLine}
+              </span>
+            )}
+          </div>
           <textarea
             rows={2}
             value={newComment}
@@ -176,8 +192,8 @@ return () => controller.abort();`,
           </h3>
 
           {comments.map((comment) => (
-            <div 
-              key={comment.id} 
+            <div
+              key={comment.id}
               className={`bg-[#151517] border rounded-xl p-4 space-y-2.5 ${
                 comment.isAccepted ? 'border-[#4CAF6D]/40' : 'border-[#242427]'
               }`}
@@ -205,7 +221,6 @@ return () => controller.abort();`,
                 {comment.text}
               </p>
 
-              {/* Proposed Code Diff Box */}
               {comment.diff && (
                 <div className="bg-[#0E0E10] border border-[#242427] rounded-lg p-2.5 font-mono text-xs text-[#4CAF6D] overflow-x-auto">
                   <pre>{comment.diff}</pre>
@@ -216,32 +231,35 @@ return () => controller.abort();`,
         </section>
       </main>
 
-      {/* Right Sidebar */}
       <div className="hidden md:block md:col-span-3">
         <RightSidebar onNavigate={onNavigate} />
       </div>
 
-      {/* Refactor Modal Overlay */}
       <RefactorModal
         isOpen={isRefactorOpen}
         lineNumber={selectedLine}
         onClose={() => setIsRefactorOpen(false)}
         onSubmitRefactor={(data) => {
-          setComments(prev => [
+          setComments((prev) => [
             ...prev,
             {
               id: Date.now(),
-              author: 'prasad_m',
+              author: user.username,
               time: 'Just now',
               line: data.lineNumber || selectedLine,
               text: data.commentText,
               diff: data.codeDiff || null,
               upvotes: 0,
-              isAccepted: false
-            }
+              isAccepted: false,
+            },
           ]);
+          addKarma(15);
           if (onShowToast) {
-            onShowToast({ title: 'Refactor Submitted', message: 'Proposed fix attached to code line.', type: 'success' });
+            onShowToast({
+              title: 'Refactor Submitted',
+              message: 'Proposed fix attached to code line (+15 Karma).',
+              type: 'success',
+            });
           }
         }}
       />

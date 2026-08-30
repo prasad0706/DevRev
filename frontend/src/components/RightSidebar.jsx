@@ -9,7 +9,6 @@ export default function RightSidebar({ onNavigate }) {
 
   return (
     <aside className="bg-[#151517] rounded-xl border border-[#242427] p-3 space-y-4">
-      {/* Section 1: Platform Pulse */}
       <div>
         <h4 className="text-[10px] uppercase tracking-wider font-semibold text-[#5A5A5E] mb-2 px-1">
           Platform Pulse
@@ -26,10 +25,7 @@ export default function RightSidebar({ onNavigate }) {
         </div>
       </div>
 
-      {/* Hairline Divider */}
       <div className="h-px bg-[#242427]" />
-
-      {/* Section 2: Top Reviewers Leaderboard */}
       <div>
         <h4 className="text-[10px] uppercase tracking-wider font-semibold text-[#5A5A5E] mb-2 px-1">
           Top Reviewers
@@ -60,10 +56,7 @@ export default function RightSidebar({ onNavigate }) {
         </div>
       </div>
 
-      {/* Hairline Divider */}
       <div className="h-px bg-[#242427]" />
-
-      {/* Section 3: Invite CTA */}
       <div className="p-1">
         <p className="text-xs text-[#8A8A8E] leading-relaxed mb-2.5">
           Review peer code to build your developer Karma rank.

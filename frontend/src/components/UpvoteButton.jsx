@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ArrowUp, ArrowDown } from 'lucide-react';
 
 export default function UpvoteButton({ initialVotes = 0, onVote, vertical = false }) {
-  const [voteState, setVoteState] = useState(0); // 1 = upvoted, -1 = downvoted, 0 = neutral
+  const [voteState, setVoteState] = useState(0);
   const [votes, setVotes] = useState(initialVotes);
 
   const handleUpvote = (e) => {
