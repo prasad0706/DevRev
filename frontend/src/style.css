@@ -13,7 +13,6 @@
   --color-success: #4CAF6D;
   --color-danger: #F0654B;
 
-  /* Legacy aliases mapped to v2 design tokens for full compatibility */
   --color-dark-bg: #0E0E10;
   --color-dark-card: #151517;
   --color-dark-border: #242427;
@@ -33,7 +32,6 @@ body {
   margin: 0;
 }
 
-/* Custom scrollbar for dark theme */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

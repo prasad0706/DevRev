@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 
-// Initial sample posts aligned with DevReview specification
 const INITIAL_POSTS = [
   {
     id: 1,
@@ -65,17 +64,11 @@ const INITIAL_POSTS = [
   },
 ];
 
-/**
- * Custom Hook: useFetchFeed
- * Purpose: Reuses post-fetching, sorting, and state manipulation logic.
- * Demonstrates: Custom Hook combining useState and useEffect.
- */
 export function useFetchFeed(initialSort = 'hot') {
   const [posts, setPosts] = useState(INITIAL_POSTS);
   const [activeSort, setActiveSort] = useState(initialSort);
   const [loading, setLoading] = useState(false);
 
-  // useEffect demonstrates running side effects when dependency [activeSort] changes
   useEffect(() => {
     setLoading(true);
     const timer = setTimeout(() => {

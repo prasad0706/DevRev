@@ -7,10 +7,8 @@ import CodeViewer from '../components/CodeViewer';
 import { MessageSquare } from 'lucide-react';
 
 export default function ProfilePage({ username = 'alex_dev', onNavigate }) {
-  // 1. Consume shared user context using useContext()
   const { user } = useContext(UserContext);
 
-  // 2. useEffect() hook to handle side effects when target [username] changes
   useEffect(() => {
     console.log(`[useEffect - Dependency] Loading profile data for @${username}`);
   }, [username]);

@@ -9,10 +9,8 @@ import RefactorModal from '../components/RefactorModal';
 import { MessageSquare, Flame, Clock, CheckCircle2, Trash2, Loader2 } from 'lucide-react';
 
 export default function HomePage({ onNavigate, onShowToast }) {
-  // 1. Consume shared user context using useContext()
   const { user } = useContext(UserContext);
 
-  // 2. Consume custom hook useFetchFeed() for post list, sorting, and manipulation
   const {
     posts,
     loading,
@@ -25,7 +23,6 @@ export default function HomePage({ onNavigate, onShowToast }) {
   const [selectedLine, setSelectedLine] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 3. useEffect() hook to demonstrate side-effects on component mount
   useEffect(() => {
     console.log('[useEffect - Mount] HomePage mounted, fetching peer review feed...');
   }, []);
@@ -48,7 +45,6 @@ export default function HomePage({ onNavigate, onShowToast }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 md:grid-cols-12 gap-6">
-      {/* Left Navigation Sidebar */}
       <div className="hidden md:block md:col-span-3">
         <LeftSidebar
           activeTab={activeSort}
@@ -60,9 +56,7 @@ export default function HomePage({ onNavigate, onShowToast }) {
         />
       </div>
 
-      {/* Central Code Feed */}
       <main className="col-span-1 md:col-span-6 space-y-3">
-        {/* Sort Bar */}
         <div className="bg-[#151517] border border-[#242427] rounded-xl px-3 py-2 flex items-center justify-between text-xs">
           <div className="flex items-center gap-4">
             <button
@@ -105,13 +99,11 @@ export default function HomePage({ onNavigate, onShowToast }) {
           )}
         </div>
 
-        {/* Feed Posts */}
         {posts.map((post) => (
           <article
             key={post.id}
             className="bg-[#151517] border border-[#242427] hover:border-[#3a3a3e] rounded-xl p-4 transition flex gap-3"
           >
-            {/* Reddit-style Vertical Vote Column */}
             <div className="shrink-0 pt-0.5">
               <UpvoteButton
                 initialVotes={post.upvotes}
@@ -137,7 +129,6 @@ export default function HomePage({ onNavigate, onShowToast }) {
                   <span className="text-[11px] text-[#5A5A5E]">
                     {post.viewers} reading
                   </span>
-                  {/* RBAC Moderator delete button consuming UserContext */}
                   {(user.isModMode || user.role === 'Admin') && (
                     <button
                       onClick={() => handleDelete(post.id)}
@@ -190,12 +181,10 @@ export default function HomePage({ onNavigate, onShowToast }) {
         ))}
       </main>
 
-      {/* Right Trends & Reviewers Sidebar */}
       <div className="hidden md:block md:col-span-3">
         <RightSidebar onNavigate={onNavigate} />
       </div>
 
-      {/* Line Feedback Modal */}
       <RefactorModal
         isOpen={isModalOpen}
         lineNumber={selectedLine}

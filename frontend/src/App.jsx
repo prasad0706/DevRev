@@ -22,7 +22,6 @@ function AppContent() {
   const [isNewPostOpen, setIsNewPostOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
 
-  // Use Custom Hook to update document title based on active page
   useDocumentTitle(
     activePage === 'home'
       ? 'Feed Home'
@@ -58,10 +57,8 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-[#0E0E10] text-[#E8E8EA] flex flex-col font-sans selection:bg-[#4F9CF9] selection:text-white">
-      {/* Global Moderator Banner consuming UserContext */}
       <AdminModBanner />
 
-      {/* Main Navbar consuming UserContext */}
       <Navbar
         onNavigate={handleNavigate}
         onOpenCommand={() => setIsCommandOpen(true)}

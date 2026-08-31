@@ -3,7 +3,6 @@ import { UserContext } from '../context/UserContext';
 import { Search, Bell, Plus, ShieldCheck } from 'lucide-react';
 
 export default function Navbar({ onNavigate, onOpenCommand, onOpenNewPost }) {
-  // Access global user context directly via useContext() - eliminates prop drilling!
   const { user, toggleModMode } = useContext(UserContext);
 
   const initials = user?.name
@@ -17,7 +16,6 @@ export default function Navbar({ onNavigate, onOpenCommand, onOpenNewPost }) {
 
   return (
     <header className="sticky top-0 z-40 bg-[#0E0E10] border-b border-[#242427] px-4 py-2.5 flex items-center justify-between">
-      {/* Brand Wordmark (no unnecessary tags or glows as per UI v2 plan) */}
       <div
         onClick={() => onNavigate('home')}
         className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition"
@@ -27,7 +25,6 @@ export default function Navbar({ onNavigate, onOpenCommand, onOpenNewPost }) {
         </span>
       </div>
 
-      {/* Quieter Search Bar */}
       <div
         onClick={onOpenCommand}
         className="hidden md:flex items-center bg-[#151517] border border-[#242427] hover:border-[#3a3a3e] rounded-lg px-3 py-1.5 w-80 text-xs cursor-pointer transition"
@@ -40,7 +37,6 @@ export default function Navbar({ onNavigate, onOpenCommand, onOpenNewPost }) {
       </div>
 
       <div className="flex items-center gap-3">
-        {/* Moderator Mode Button */}
         <button
           onClick={toggleModMode}
           className={`px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition border ${
@@ -67,7 +63,6 @@ export default function Navbar({ onNavigate, onOpenCommand, onOpenNewPost }) {
           <Bell size={18} />
         </button>
 
-        {/* Primary Action Button (Only filled accent button in nav) */}
         <button
           onClick={onOpenNewPost}
           className="bg-[#4F9CF9] hover:bg-[#3b82f6] text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-xs"
@@ -76,7 +71,6 @@ export default function Navbar({ onNavigate, onOpenCommand, onOpenNewPost }) {
           <span>Post Code</span>
         </button>
 
-        {/* User Profile Avatar */}
         <button
           onClick={() => onNavigate('dashboard')}
           className="w-7 h-7 rounded-full bg-[#151517] border border-[#242427] hover:border-[#4F9CF9] flex items-center justify-center text-xs font-semibold text-[#E8E8EA] transition"

@@ -53,7 +53,7 @@ export default function RefactorModal({ isOpen, onClose, lineNumber, onSubmitRef
               rows={4}
               value={codeDiff}
               onChange={(e) => setCodeDiff(e.target.value)}
-              placeholder="// Paste your proposed fix here..."
+              placeholder="Paste your proposed fix here..."
               className="w-full bg-[#0E0E10] border border-[#242427] rounded-lg p-2.5 text-xs font-mono text-[#4CAF6D] placeholder-[#5A5A5E] outline-none focus:border-[#4CAF6D]"
             />
           </div>

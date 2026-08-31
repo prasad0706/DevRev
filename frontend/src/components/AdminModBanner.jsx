@@ -3,7 +3,6 @@ import { UserContext } from '../context/UserContext';
 import { ShieldCheck, X } from 'lucide-react';
 
 export default function AdminModBanner() {
-  // Directly consume context state
   const { user, toggleModMode } = useContext(UserContext);
 
   if (!user?.isModMode) return null;

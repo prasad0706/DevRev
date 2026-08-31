@@ -8,14 +8,12 @@ import RefactorModal from '../components/RefactorModal';
 import { ArrowLeft, CheckCircle2, GitPullRequest, Send } from 'lucide-react';
 
 export default function PostDetailPage({ postId = 1, onNavigate, onShowToast }) {
-  // 1. Consume shared user context using useContext()
   const { user, addKarma } = useContext(UserContext);
 
   const [isRefactorOpen, setIsRefactorOpen] = useState(false);
   const [selectedLine, setSelectedLine] = useState(null);
   const [newComment, setNewComment] = useState('');
 
-  // 2. useEffect() hook on component mount [postId] to simulate fetching post detail
   useEffect(() => {
     console.log(`[useEffect - Dependency] PostDetailPage loaded for Post ID: ${postId}`);
   }, [postId]);
@@ -54,10 +52,8 @@ export default function PostDetailPage({ postId = 1, onNavigate, onShowToast }) 
       time: '10m ago',
       line: 6,
       text: 'Good catch adding `isMounted` flag! Alternatively, consider using `AbortController` which actually cancels the network request in flight.',
-      diff: `// Suggested AbortController pattern:
-const controller = new AbortController();
+      diff: `const controller = new AbortController();
 fetch(url, { signal: controller.signal })
-// ...
 return () => controller.abort();`,
       upvotes: 12,
       isAccepted: true,
@@ -91,7 +87,7 @@ return () => controller.abort();`,
 
     setComments((prev) => [...prev, commentObj]);
     setNewComment('');
-    addKarma(5); // Context action: award karma for submitting peer review
+    addKarma(5);
 
     if (onShowToast) {
       onShowToast({
@@ -158,7 +154,6 @@ return () => controller.abort();`,
           </div>
         </article>
 
-        {/* Comment input form */}
         <form onSubmit={handleAddComment} className="bg-[#151517] border border-[#242427] rounded-xl p-4 space-y-2">
           <div className="flex items-center justify-between text-xs text-[#8A8A8E] mb-1">
             <span>Commenting as <strong className="text-[#E8E8EA]">@{user.username}</strong></span>
@@ -185,7 +180,6 @@ return () => controller.abort();`,
           </div>
         </form>
 
-        {/* Comments & Refactors Thread */}
         <section className="space-y-3">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-[#8A8A8E]">
             Peer Reviews ({comments.length})

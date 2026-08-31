@@ -1,21 +1,18 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { UserContext } from '../context/UserContext';
-import { Award, Code, CheckCircle2, TrendingUp, Sparkles, Shield, UserCheck, RefreshCw } from 'lucide-react';
+import { Award, Code, CheckCircle2, TrendingUp, Sparkles, RefreshCw } from 'lucide-react';
 
 export default function DashboardPage({ onNavigate }) {
-  // 1. Access shared context data using useContext() - No prop drilling needed
-  const { user, switchRole, addKarma, toggleModMode } = useContext(UserContext);
+  const { user, switchRole, addKarma } = useContext(UserContext);
 
   const [activeTab, setActiveTab] = useState('activity');
   const [effectMessage, setEffectMessage] = useState('');
 
-  // 2. useEffect() Demonstration 1: Runs once when component loads (empty dependency array [])
   useEffect(() => {
     console.log(`[useEffect - Mount] Dashboard loaded for ${user.username}`);
     setEffectMessage('Dashboard initialized via useEffect on mount []');
   }, []);
 
-  // 3. useEffect() Demonstration 2: Runs whenever user.karma changes ([user.karma])
   useEffect(() => {
     console.log(`[useEffect - Dependency] Karma updated to ${user.karma}`);
   }, [user.karma]);
@@ -53,7 +50,6 @@ export default function DashboardPage({ onNavigate }) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
-      {/* Experiment 2 Demo Notice Box */}
       <div className="bg-[#151517] border border-[#242427] rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
         <div>
           <span className="text-[#4F9CF9] font-semibold block">
@@ -65,7 +61,6 @@ export default function DashboardPage({ onNavigate }) {
           </span>
         </div>
 
-        {/* Role Switcher to demonstrate live context updates */}
         <div className="flex items-center gap-1.5 bg-[#0E0E10] border border-[#242427] p-1 rounded-lg">
           <button
             onClick={() => switchRole('Student')}
@@ -100,7 +95,6 @@ export default function DashboardPage({ onNavigate }) {
         </div>
       </div>
 
-      {/* Profile Header & Stat Bar */}
       <div className="bg-[#151517] border border-[#242427] rounded-xl p-6 space-y-6">
         <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-4 text-center sm:text-left">
           <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -124,7 +118,6 @@ export default function DashboardPage({ onNavigate }) {
             <button
               onClick={() => addKarma(10)}
               className="bg-[#1C1C1F] hover:bg-[#242427] text-[#4F9CF9] border border-[#242427] text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5"
-              title="Demonstrates context state update triggering useEffect"
             >
               <RefreshCw size={13} /> +10 Karma
             </button>
@@ -137,7 +130,6 @@ export default function DashboardPage({ onNavigate }) {
           </div>
         </div>
 
-        {/* Single Stat Bar */}
         <div className="grid grid-cols-4 divide-x divide-[#242427] bg-[#0E0E10] border border-[#242427] rounded-lg p-3 text-center">
           <div>
             <span className="text-[10px] text-[#8A8A8E] uppercase tracking-wider block">Karma</span>
