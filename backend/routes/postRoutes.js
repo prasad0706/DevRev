@@ -1,9 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const Post = require("../models/Post");
+const { protect, requireAdmin } = require("../middleware/authMiddleware");
 
 // 1. CREATE POST
-router.post("/", async (req, res) => {
+// router.post("/", async (req, res) => {
+  router.post("/", protect, async (req, res) => {
   try {
     const post = await Post.create(req.body);
     res.status(201).json(post);
@@ -36,7 +38,8 @@ router.get("/:id", async (req, res) => {
 });
 
 // 4. UPDATE POST
-router.put("/:id", async (req, res) => {
+// router.put("/:id", async (req, res) => {
+  router.put("/:id", protect, requireAdmin, async (req, res) => {
   try {
     const post = await Post.findByIdAndUpdate(
       req.params.id,
@@ -53,7 +56,8 @@ router.put("/:id", async (req, res) => {
 });
 
 // 5. DELETE POST
-router.delete("/:id", async (req, res) => {
+// router.delete("/:id", async (req, res) => {
+  router.delete("/:id", protect, requireAdmin, async (req, res) => {
   try {
     const post = await Post.findByIdAndDelete(req.params.id);
     if (!post) {

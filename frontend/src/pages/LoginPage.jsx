@@ -6,16 +6,57 @@ export default function LoginPage({ onNavigate }) {
   const { login } = useContext(UserContext);
   const [email, setEmail] = useState('prasad@devreview.io');
   const [password, setPassword] = useState('password123');
+  const [error, setError] = useState("");
+const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    login({
-      email,
-      name: email.split('@')[0],
-      username: email.split('@')[0],
-    });
-    onNavigate('dashboard');
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  setError("");
+  setLoading(true);
+
+  try {
+    const response = await fetch(
+      "http://localhost:5000/api/users/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setError(
+        data.message || "Invalid email or password"
+      );
+      return;
+    }
+
+    // Save JWT
+    localStorage.setItem("token", data.token);
+
+    // Save authenticated user
+    login(data.user);
+
+    onNavigate("dashboard");
+  } catch (error) {
+    console.error("Login error:", error);
+
+    setError(
+      "Unable to connect to the server."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
@@ -24,7 +65,13 @@ export default function LoginPage({ onNavigate }) {
         <p className="text-[#8A8A8E] text-xs text-center mb-5">
           Login to review peer code & earn developer Karma
         </p>
-
+{error && (
+  <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2">
+    <p className="text-xs text-red-400">
+      {error}
+    </p>
+  </div>
+)}
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div>
             <label className="block text-xs font-medium text-[#8A8A8E] mb-1">
