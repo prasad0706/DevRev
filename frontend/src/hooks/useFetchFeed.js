@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { getPosts, createPost as apiCreatePost, upvotePost as apiUpvotePost, deletePost as apiDeletePost } from '../utils/api';
 
-const INITIAL_POSTS = [
+const FALLBACK_POSTS = [
   {
-    id: 1,
+    _id: '1',
+    id: '1',
     author: 'alex_dev',
     title: 'Is this custom React hook causing memory leaks or unnecessary re-renders in useEffect?',
-    time: '12m ago',
+    createdAt: new Date().toISOString(),
     language: 'javascript',
     tags: ['react', 'performance'],
     code: `const useFetchData = (url) => {
@@ -20,15 +22,22 @@ const INITIAL_POSTS = [
   return data;
 };`,
     upvotes: 42,
-    commentsCount: 8,
-    viewers: 6,
-    status: 'open',
+    comments: [
+      {
+        author: 'sarah_backend',
+        text: 'Consider using AbortController to cancel network requests in flight.',
+        line: 5,
+        diff: 'const controller = new AbortController();\nfetch(url, { signal: controller.signal });',
+        isAccepted: true,
+      },
+    ],
   },
   {
-    id: 2,
+    _id: '2',
+    id: '2',
     author: 'sarah_backend',
     title: 'Review my MongoDB aggregation pipeline for dynamic category filtering',
-    time: '45m ago',
+    createdAt: new Date(Date.now() - 3600000).toISOString(),
     language: 'javascript',
     tags: ['mongodb', 'express'],
     code: `await db.collection('posts').aggregate([
@@ -37,15 +46,14 @@ const INITIAL_POSTS = [
   { $sort: { total: -1 } }
 ]);`,
     upvotes: 27,
-    commentsCount: 3,
-    viewers: 2,
-    status: 'open',
+    comments: [],
   },
   {
-    id: 3,
+    _id: '3',
+    id: '3',
     author: 'michael_sec',
     title: 'Is this JWT bearer token validation logic susceptible to timing attacks?',
-    time: '2h ago',
+    createdAt: new Date(Date.now() - 7200000).toISOString(),
     language: 'javascript',
     tags: ['security', 'express'],
     code: `const verifyToken = (req, res, next) => {
@@ -58,71 +66,112 @@ const INITIAL_POSTS = [
   });
 };`,
     upvotes: 65,
-    commentsCount: 14,
-    viewers: 11,
-    status: 'resolved',
+    comments: [],
   },
 ];
 
 export function useFetchFeed(initialSort = 'hot') {
-  const [posts, setPosts] = useState(INITIAL_POSTS);
+  const [posts, setPosts] = useState([]);
   const [activeSort, setActiveSort] = useState(initialSort);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch posts from backend API (EXP NO. 4: Read All)
+  const loadPosts = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getPosts();
+      if (Array.isArray(data) && data.length > 0) {
+        setPosts(data);
+      } else {
+        setPosts(FALLBACK_POSTS);
+      }
+    } catch (err) {
+      console.warn('Backend not responding to GET /api/posts, using fallback snippets:', err.message);
+      setPosts(FALLBACK_POSTS);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setPosts((prevPosts) => {
-        const sorted = [...prevPosts];
-        if (activeSort === 'hot') {
-          return sorted.sort((a, b) => b.upvotes - a.upvotes);
-        } else if (activeSort === 'latest') {
-          return sorted.sort((a, b) => b.id - a.id);
-        } else if (activeSort === 'needs-review') {
-          return sorted.sort((a, b) => (a.status === 'open' ? -1 : 1));
-        }
-        return sorted;
-      });
-      setLoading(false);
-    }, 150);
+    loadPosts();
+  }, [loadPosts]);
 
-    return () => clearTimeout(timer);
-  }, [activeSort]);
+  // Sort posts based on active tab
+  const sortedPosts = [...posts].sort((a, b) => {
+    if (activeSort === 'hot') {
+      return (b.upvotes || 0) - (a.upvotes || 0);
+    }
+    if (activeSort === 'latest') {
+      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    }
+    if (activeSort === 'needs-review') {
+      return (a.comments?.length || 0) - (b.comments?.length || 0);
+    }
+    return 0;
+  });
 
-  const addPost = (newPost) => {
-    const postObj = {
-      id: Date.now(),
-      author: newPost.author || 'prasad_m',
-      title: newPost.title,
-      time: 'Just now',
-      language: newPost.language || 'javascript',
-      tags: newPost.tags || ['code-review'],
-      code: newPost.code,
-      upvotes: 1,
-      commentsCount: 0,
-      viewers: 1,
-      status: 'open',
-    };
-    setPosts((prev) => [postObj, ...prev]);
+  // Create Post (EXP NO. 4: Create)
+  const addPost = async (newPostData) => {
+    try {
+      const created = await apiCreatePost(newPostData);
+      setPosts((prev) => [created, ...prev]);
+      return created;
+    } catch (err) {
+      // Offline fallback
+      const localPost = {
+        _id: String(Date.now()),
+        id: String(Date.now()),
+        createdAt: new Date().toISOString(),
+        upvotes: 0,
+        comments: [],
+        ...newPostData,
+      };
+      setPosts((prev) => [localPost, ...prev]);
+      return localPost;
+    }
   };
 
-  const deletePost = (id) => {
-    setPosts((prev) => prev.filter((p) => p.id !== id));
-  };
-
-  const upvotePost = (id, delta) => {
+  // Upvote Post (EXP NO. 4: Update)
+  const upvotePost = async (id, delta = 1) => {
+    // Optimistic UI update
     setPosts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, upvotes: p.upvotes + delta } : p))
+      prev.map((p) =>
+        (p._id === id || p.id === id)
+          ? { ...p, upvotes: Math.max(0, (p.upvotes || 0) + delta) }
+          : p
+      )
     );
+    try {
+      await apiUpvotePost(id, delta);
+    } catch (err) {
+      console.warn('Upvote API error:', err.message);
+    }
+  };
+
+  // Delete Post (EXP NO. 4 & 6: Protected Delete)
+  const deletePost = async (id) => {
+    setPosts((prev) => prev.filter((p) => p._id !== id && p.id !== id));
+    try {
+      await apiDeletePost(id);
+    } catch (err) {
+      console.error('Delete post error:', err.message);
+      throw err;
+    }
   };
 
   return {
-    posts,
+    posts: sortedPosts,
     loading,
+    error,
     activeSort,
     setActiveSort,
+    refreshPosts: loadPosts,
     addPost,
-    deletePost,
     upvotePost,
+    deletePost,
   };
 }

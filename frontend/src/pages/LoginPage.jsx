@@ -1,30 +1,85 @@
 import React, { useState, useContext } from 'react';
 import { UserContext } from '../context/UserContext';
-import { Mail, Lock } from 'lucide-react';
+import { loginUser } from '../utils/api';
+import { Mail, Lock, ShieldCheck, UserCheck, AlertCircle } from 'lucide-react';
 
 export default function LoginPage({ onNavigate }) {
-  const { login } = useContext(UserContext);
+  const { login, quickDemoLogin } = useContext(UserContext);
   const [email, setEmail] = useState('prasad@devreview.io');
   const [password, setPassword] = useState('password123');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login({
-      email,
-      name: email.split('@')[0],
-      username: email.split('@')[0],
-    });
-    onNavigate('dashboard');
+    setError('');
+    setLoading(true);
+
+    try {
+      const data = await loginUser({ email, password });
+      login(data.token, data.user);
+      onNavigate('dashboard');
+    } catch (err) {
+      setError(err.message || 'Invalid email or password.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleQuickLogin = async (role) => {
+    setError('');
+    setLoading(true);
+    try {
+      await quickDemoLogin(role);
+      onNavigate('dashboard');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
-      <div className="bg-[#151517] border border-[#242427] rounded-xl p-6 w-full max-w-sm shadow-xl">
-        <h2 className="text-xl font-bold text-[#E8E8EA] text-center mb-1">Welcome Back</h2>
-        <p className="text-[#8A8A8E] text-xs text-center mb-5">
-          Login to review peer code & earn developer Karma
-        </p>
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-8">
+      <div className="bg-[#151517] border border-[#242427] rounded-xl p-6 w-full max-w-md shadow-2xl space-y-5">
+        <div className="text-center">
+          <h2 className="text-xl font-bold text-[#E8E8EA]">Sign In to DevReview</h2>
+          <p className="text-[#8A8A8E] text-xs mt-1">
+            Sign in to review peer code, submit refactors, and earn karma.
+          </p>
+        </div>
 
+        {error && (
+          <div className="bg-red-950/40 border border-red-800/50 rounded-lg p-2.5 text-xs text-red-300 flex items-center gap-2">
+            <AlertCircle size={15} className="shrink-0 text-red-400" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {/* Quick Sign In Buttons */}
+        <div className="bg-[#0E0E10] border border-[#242427] rounded-lg p-3 space-y-2">
+          <span className="text-[11px] font-semibold text-[#8A8A8E] block uppercase tracking-wider">
+            Quick Sign In:
+          </span>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => handleQuickLogin('user')}
+              className="bg-[#1C1C1F] hover:bg-[#242427] border border-[#242427] text-sky-400 text-xs py-2 px-2.5 rounded-lg flex items-center justify-center gap-1.5 transition font-medium"
+            >
+              <UserCheck size={14} /> Developer
+            </button>
+            <button
+              type="button"
+              onClick={() => handleQuickLogin('admin')}
+              className="bg-amber-950/30 hover:bg-amber-900/40 border border-amber-800/40 text-amber-300 text-xs py-2 px-2.5 rounded-lg flex items-center justify-center gap-1.5 transition font-medium"
+            >
+              <ShieldCheck size={14} /> Administrator
+            </button>
+          </div>
+        </div>
+
+        {/* Standard Email/Password Form */}
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div>
             <label className="block text-xs font-medium text-[#8A8A8E] mb-1">
@@ -62,19 +117,20 @@ export default function LoginPage({ onNavigate }) {
 
           <button
             type="submit"
-            className="w-full bg-[#4F9CF9] hover:bg-[#3b82f6] text-white font-semibold text-xs py-2 rounded-lg transition shadow-xs mt-2"
+            disabled={loading}
+            className="w-full bg-[#4F9CF9] hover:bg-[#3b82f6] text-white font-semibold text-xs py-2.5 rounded-lg transition shadow-xs mt-2 disabled:opacity-50"
           >
-            Sign In
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
-        <p className="text-xs text-[#8A8A8E] text-center mt-5">
+        <p className="text-xs text-[#8A8A8E] text-center pt-2 border-t border-[#242427]">
           Don't have an account?{' '}
           <button
             onClick={() => onNavigate('register')}
             className="text-[#4F9CF9] hover:underline font-medium"
           >
-            Register here
+            Create an account
           </button>
         </p>
       </div>

@@ -13,14 +13,14 @@ export default function ProfilePage({ username = 'alex_dev', onNavigate }) {
     console.log(`[useEffect - Dependency] Loading profile data for @${username}`);
   }, [username]);
 
-  const isSelf = user.username === username;
+  const isSelf = Boolean(user && (user.username === username || user.name === username));
 
   const profile = {
     username: username,
-    name: isSelf ? user.name : username === 'alex_dev' ? 'Alex Rivera' : 'Sarah Chen',
-    role: isSelf ? user.role : username === 'alex_dev' ? 'Verified Reviewer' : 'Moderator',
-    karma: isSelf ? user.karma : username === 'alex_dev' ? 620 : 850,
-    acceptedCount: isSelf ? user.acceptedRefactors : username === 'alex_dev' ? 15 : 24,
+    name: isSelf ? (user?.name || 'Developer') : username === 'alex_dev' ? 'Alex Rivera' : 'Sarah Chen',
+    role: isSelf ? (user?.role || 'user') : username === 'alex_dev' ? 'Verified Reviewer' : 'Moderator',
+    karma: isSelf ? (user?.karma || 150) : username === 'alex_dev' ? 620 : 850,
+    acceptedCount: isSelf ? (user?.acceptedRefactors || 4) : username === 'alex_dev' ? 15 : 24,
     joined: 'Aug 2026',
     bio: isSelf
       ? 'Full Stack Developer & React internals enthusiast.'

@@ -7,6 +7,11 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    username: {
+      type: String,
+      trim: true,
+      lowercase: true,
+    },
     email: {
       type: String,
       required: true,
@@ -21,6 +26,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["user", "admin"],
       default: "user",
+    },
+    karma: {
+      type: Number,
+      default: 100,
     },
   },
   { timestamps: true }

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Home, Code, User, LogIn, X } from 'lucide-react';
+import { Search, Home, Code, User, LogIn, X, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 export default function CommandPalette({ isOpen, onClose, onNavigate }) {
   const [query, setQuery] = useState('');
+  const { isLight, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -23,6 +25,11 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }) {
   if (!isOpen) return null;
 
   const options = [
+    {
+      label: isLight ? 'Switch to Dark Theme' : 'Switch to Light Theme',
+      icon: isLight ? Moon : Sun,
+      action: 'toggle-theme',
+    },
     { label: 'Feed Home', icon: Home, page: 'home' },
     { label: 'View Post Detail (#1 React Hook)', icon: Code, page: 'post-detail', param: 1 },
     { label: 'Developer Dashboard', icon: User, page: 'dashboard' },
@@ -61,7 +68,11 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }) {
                 <button
                   key={idx}
                   onClick={() => {
-                    onNavigate(opt.page, opt.param);
+                    if (opt.action === 'toggle-theme') {
+                      toggleTheme();
+                    } else {
+                      onNavigate(opt.page, opt.param);
+                    }
                     onClose();
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-[#E8E8EA] hover:bg-[#1C1C1F] hover:text-[#4F9CF9] transition text-left"

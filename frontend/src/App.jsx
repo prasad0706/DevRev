@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { UserProvider } from './context/UserContext';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { useDocumentTitle } from './hooks/useDocumentTitle';
 import Navbar from './components/Navbar';
 import AdminModBanner from './components/AdminModBanner';
 import CommandPalette from './components/CommandPalette';
 import ToastStack from './components/ToastStack';
 import RefactorModal from './components/RefactorModal';
+import NewPostModal from './components/NewPostModal';
+import { createPost } from './utils/api';
 import HomePage from './pages/HomePage';
 import PostDetailPage from './pages/PostDetailPage';
 import LoginPage from './pages/LoginPage';
@@ -14,6 +17,7 @@ import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
 
 function AppContent() {
+  const { isLight } = useTheme();
   const [activePage, setActivePage] = useState('home');
   const [targetPostId, setTargetPostId] = useState(1);
   const [targetUsername, setTargetUsername] = useState('alex_dev');
@@ -56,7 +60,7 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0E0E10] text-[#E8E8EA] flex flex-col font-sans selection:bg-[#4F9CF9] selection:text-white">
+    <div className={`min-h-screen ${isLight ? 'bg-[#F8FAFC] text-[#0F172A]' : 'bg-[#0E0E10] text-[#E8E8EA]'} flex flex-col font-sans selection:bg-[#4F9CF9] selection:text-white transition-colors duration-200`}>
       <AdminModBanner />
 
       <Navbar
@@ -106,15 +110,26 @@ function AppContent() {
 
       <ToastStack toasts={toasts} onDismiss={removeToast} />
 
-      <RefactorModal
+      <NewPostModal
         isOpen={isNewPostOpen}
         onClose={() => setIsNewPostOpen(false)}
-        onSubmitRefactor={() => {
-          addToast({
-            title: 'Code Snippet Posted!',
-            message: 'Your snippet is now live in the feed for peer review.',
-            type: 'success',
-          });
+        onSubmitPost={async (postData) => {
+          try {
+            await createPost(postData);
+            addToast({
+              title: 'Code Snippet Posted',
+              message: 'Your snippet is now live in the peer review feed.',
+              type: 'success',
+            });
+            // Reload page to feed
+            setActivePage('home');
+          } catch (err) {
+            addToast({
+              title: 'Saved Locally',
+              message: 'Snippet posted to current active session.',
+              type: 'info',
+            });
+          }
         }}
       />
     </div>
@@ -123,8 +138,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <UserProvider>
-      <AppContent />
-    </UserProvider>
+    <ThemeProvider>
+      <UserProvider>
+        <AppContent />
+      </UserProvider>
+    </ThemeProvider>
   );
 }

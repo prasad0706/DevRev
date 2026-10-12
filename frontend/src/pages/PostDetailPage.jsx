@@ -1,28 +1,29 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { UserContext } from '../context/UserContext';
+import { getPostById, addPostComment, upvotePost } from '../utils/api';
 import LeftSidebar from '../components/LeftSidebar';
 import RightSidebar from '../components/RightSidebar';
 import CodeViewer from '../components/CodeViewer';
 import UpvoteButton from '../components/UpvoteButton';
 import RefactorModal from '../components/RefactorModal';
-import { ArrowLeft, CheckCircle2, GitPullRequest, Send } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, GitPullRequest, Send, Loader2 } from 'lucide-react';
 
-export default function PostDetailPage({ postId = 1, onNavigate, onShowToast }) {
+export default function PostDetailPage({ postId = '1', onNavigate, onShowToast }) {
   const { user, addKarma } = useContext(UserContext);
 
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [isRefactorOpen, setIsRefactorOpen] = useState(false);
   const [selectedLine, setSelectedLine] = useState(null);
   const [newComment, setNewComment] = useState('');
 
-  useEffect(() => {
-    console.log(`[useEffect - Dependency] PostDetailPage loaded for Post ID: ${postId}`);
-  }, [postId]);
-
-  const post = {
+  // Fallback post in case backend has not seeded yet
+  const fallbackPost = {
+    _id: postId,
     id: postId,
     author: 'alex_dev',
     title: 'Is this custom React hook causing memory leaks or unnecessary re-renders in useEffect?',
-    time: '12m ago',
+    createdAt: new Date().toISOString(),
     language: 'javascript',
     tags: ['react', 'performance'],
     code: `const useFetchData = (url) => {
@@ -42,57 +43,93 @@ export default function PostDetailPage({ postId = 1, onNavigate, onShowToast }) 
   return data;
 };`,
     upvotes: 42,
-    status: 'Open',
+    comments: [
+      {
+        author: 'sarah_backend',
+        createdAt: new Date(),
+        line: 6,
+        text: 'Good catch adding isMounted flag! Consider using AbortController to cancel network requests in flight.',
+        diff: 'const controller = new AbortController();\nfetch(url, { signal: controller.signal })\nreturn () => controller.abort();',
+        isAccepted: true,
+      },
+    ],
   };
 
-  const [comments, setComments] = useState([
-    {
-      id: 101,
-      author: 'sarah_backend',
-      time: '10m ago',
-      line: 6,
-      text: 'Good catch adding `isMounted` flag! Alternatively, consider using `AbortController` which actually cancels the network request in flight.',
-      diff: `const controller = new AbortController();
-fetch(url, { signal: controller.signal })
-return () => controller.abort();`,
-      upvotes: 12,
-      isAccepted: true,
-    },
-    {
-      id: 102,
-      author: 'prasad_m',
-      time: '5m ago',
-      line: 12,
-      text: 'Make sure `url` is sanitized if passed from dynamic route params.',
-      diff: null,
-      upvotes: 3,
-      isAccepted: false,
-    },
-  ]);
+  useEffect(() => {
+    async function loadPost() {
+      setLoading(true);
+      try {
+        const data = await getPostById(postId);
+        setPost(data || fallbackPost);
+      } catch (err) {
+        setPost(fallbackPost);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadPost();
+  }, [postId]);
 
-  const handleAddComment = (e) => {
+  const activePost = post || fallbackPost;
+  const comments = activePost.comments || [];
+
+  const handleAddComment = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
 
-    const commentObj = {
-      id: Date.now(),
-      author: user.username,
-      time: 'Just now',
-      line: selectedLine || null,
+    const commentData = {
+      author: user?.name || user?.username || 'Student Reviewer',
       text: newComment,
+      line: selectedLine || null,
       diff: null,
-      upvotes: 0,
-      isAccepted: false,
     };
 
-    setComments((prev) => [...prev, commentObj]);
+    try {
+      const updated = await addPostComment(activePost._id || activePost.id, commentData);
+      setPost(updated);
+    } catch (err) {
+      // Local optimistic update
+      setPost((prev) => ({
+        ...prev,
+        comments: [...(prev.comments || []), { ...commentData, createdAt: new Date() }],
+      }));
+    }
+
     setNewComment('');
-    addKarma(5);
+    addKarma(10);
 
     if (onShowToast) {
       onShowToast({
-        title: 'Comment Posted',
-        message: 'Your review comment has been added (+5 Karma).',
+        title: 'Review Comment Posted',
+        message: 'Your peer feedback has been saved (+10 Developer Karma).',
+        type: 'success',
+      });
+    }
+  };
+
+  const handleRefactorSubmit = async (data) => {
+    const commentData = {
+      author: user?.name || user?.username || 'Student Reviewer',
+      text: data.commentText,
+      line: data.lineNumber || selectedLine,
+      diff: data.codeDiff || null,
+    };
+
+    try {
+      const updated = await addPostComment(activePost._id || activePost.id, commentData);
+      setPost(updated);
+    } catch (err) {
+      setPost((prev) => ({
+        ...prev,
+        comments: [...(prev.comments || []), { ...commentData, createdAt: new Date() }],
+      }));
+    }
+
+    addKarma(25);
+    if (onShowToast) {
+      onShowToast({
+        title: 'Refactor Proposed',
+        message: 'Your suggested code fix is attached to the snippet (+25 Karma).',
         type: 'success',
       });
     }
@@ -112,51 +149,62 @@ return () => controller.abort();`,
           <ArrowLeft size={14} /> Back to feed
         </button>
 
-        <article className="bg-[#151517] border border-[#242427] rounded-xl p-5 space-y-4">
-          <div className="flex items-center justify-between text-xs text-[#8A8A8E]">
-            <div className="flex items-center gap-1.5">
-              <span className="font-semibold text-[#E8E8EA]">@{post.author}</span>
-              <span>·</span>
-              <span>{post.time}</span>
+        {loading ? (
+          <div className="bg-[#151517] border border-[#242427] rounded-xl p-8 flex items-center justify-center gap-2 text-xs text-[#8A8A8E]">
+            <Loader2 size={16} className="animate-spin text-[#4F9CF9]" />
+            <span>Loading code review details (GET /api/posts/:id)...</span>
+          </div>
+        ) : (
+          <article className="bg-[#151517] border border-[#242427] rounded-xl p-5 space-y-4">
+            <div className="flex items-center justify-between text-xs text-[#8A8A8E]">
+              <div className="flex items-center gap-1.5">
+                <span className="font-semibold text-[#E8E8EA]">@{activePost.author}</span>
+                <span>·</span>
+                <span>{activePost.createdAt ? new Date(activePost.createdAt).toLocaleDateString() : 'Recent'}</span>
+              </div>
+              <span className="text-xs text-[#4CAF6D] font-medium flex items-center gap-1">
+                <CheckCircle2 size={13} /> Active Review
+              </span>
             </div>
-            <span className="text-xs text-[#4CAF6D] font-medium flex items-center gap-1">
-              <CheckCircle2 size={13} /> {post.status}
-            </span>
-          </div>
 
-          <h1 className="text-base font-semibold text-[#E8E8EA] leading-snug">
-            {post.title}
-          </h1>
+            <h1 className="text-base font-semibold text-[#E8E8EA] leading-snug">
+              {activePost.title}
+            </h1>
 
-          <div>
-            <div className="flex items-center justify-between text-[11px] text-[#8A8A8E] mb-1">
-              <span>Click line number to suggest line-specific refactor</span>
+            <div>
+              <div className="flex items-center justify-between text-[11px] text-[#8A8A8E] mb-1">
+                <span>Click line number to suggest line-specific refactor</span>
+              </div>
+              <CodeViewer
+                code={activePost.code}
+                language={activePost.language || 'javascript'}
+                compact={false}
+                onSelectLine={(lineNum) => {
+                  setSelectedLine(lineNum);
+                  setIsRefactorOpen(true);
+                }}
+              />
             </div>
-            <CodeViewer
-              code={post.code}
-              language={post.language}
-              compact={false}
-              onSelectLine={(lineNum) => {
-                setSelectedLine(lineNum);
-                setIsRefactorOpen(true);
-              }}
-            />
-          </div>
 
-          <div className="flex items-center justify-between text-xs pt-2 border-t border-[#242427]">
-            <UpvoteButton initialVotes={post.upvotes} />
-            <button
-              onClick={() => setIsRefactorOpen(true)}
-              className="bg-[#1C1C1F] hover:bg-[#242427] border border-[#242427] text-[#4F9CF9] text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5"
-            >
-              <GitPullRequest size={14} /> Propose Refactor
-            </button>
-          </div>
-        </article>
+            <div className="flex items-center justify-between text-xs pt-2 border-t border-[#242427]">
+              <UpvoteButton
+                initialVotes={activePost.upvotes || 0}
+                onVote={(delta) => upvotePost(activePost._id || activePost.id, delta)}
+              />
+              <button
+                onClick={() => setIsRefactorOpen(true)}
+                className="bg-[#1C1C1F] hover:bg-[#242427] border border-[#242427] text-[#4F9CF9] text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5"
+              >
+                <GitPullRequest size={14} /> Propose Refactor
+              </button>
+            </div>
+          </article>
+        )}
 
+        {/* Comment submission form */}
         <form onSubmit={handleAddComment} className="bg-[#151517] border border-[#242427] rounded-xl p-4 space-y-2">
           <div className="flex items-center justify-between text-xs text-[#8A8A8E] mb-1">
-            <span>Commenting as <strong className="text-[#E8E8EA]">@{user.username}</strong></span>
+            <span>Commenting as <strong className="text-[#E8E8EA]">@{user?.name || 'Reviewer'}</strong></span>
             {selectedLine && (
               <span className="text-[#4F9CF9] font-mono text-[11px]">
                 Targeting Line {selectedLine}
@@ -167,7 +215,7 @@ return () => controller.abort();`,
             rows={2}
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Write a constructive review comment..."
+            placeholder="Write constructive peer feedback or code review notes..."
             className="w-full bg-[#0E0E10] border border-[#242427] rounded-lg p-2.5 text-xs text-[#E8E8EA] placeholder-[#5A5A5E] outline-none focus:border-[#4F9CF9]"
           />
           <div className="flex justify-end">
@@ -175,19 +223,20 @@ return () => controller.abort();`,
               type="submit"
               className="bg-[#4F9CF9] hover:bg-[#3b82f6] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
             >
-              <Send size={13} /> Post Comment
+              <Send size={13} /> Post Review Comment
             </button>
           </div>
         </form>
 
+        {/* Peer Reviews List */}
         <section className="space-y-3">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-[#8A8A8E]">
             Peer Reviews ({comments.length})
           </h3>
 
-          {comments.map((comment) => (
+          {comments.map((comment, idx) => (
             <div
-              key={comment.id}
+              key={comment._id || idx}
               className={`bg-[#151517] border rounded-xl p-4 space-y-2.5 ${
                 comment.isAccepted ? 'border-[#4CAF6D]/40' : 'border-[#242427]'
               }`}
@@ -195,8 +244,6 @@ return () => controller.abort();`,
               <div className="flex items-center justify-between text-xs text-[#8A8A8E]">
                 <div className="flex items-center gap-1.5">
                   <span className="font-semibold text-[#E8E8EA]">@{comment.author}</span>
-                  <span>·</span>
-                  <span>{comment.time}</span>
                   {comment.line && (
                     <span className="bg-[#0E0E10] border border-[#242427] px-1.5 py-0.5 rounded text-[10px] font-mono text-[#4F9CF9]">
                       Line {comment.line}
@@ -233,29 +280,7 @@ return () => controller.abort();`,
         isOpen={isRefactorOpen}
         lineNumber={selectedLine}
         onClose={() => setIsRefactorOpen(false)}
-        onSubmitRefactor={(data) => {
-          setComments((prev) => [
-            ...prev,
-            {
-              id: Date.now(),
-              author: user.username,
-              time: 'Just now',
-              line: data.lineNumber || selectedLine,
-              text: data.commentText,
-              diff: data.codeDiff || null,
-              upvotes: 0,
-              isAccepted: false,
-            },
-          ]);
-          addKarma(15);
-          if (onShowToast) {
-            onShowToast({
-              title: 'Refactor Submitted',
-              message: 'Proposed fix attached to code line (+15 Karma).',
-              type: 'success',
-            });
-          }
-        }}
+        onSubmitRefactor={handleRefactorSubmit}
       />
     </div>
   );

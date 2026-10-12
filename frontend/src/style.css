@@ -23,6 +23,17 @@
   --color-brand-accent: #4F9CF9;
 }
 
+:root {
+  --color-bg: #0E0E10;
+  --color-bg-elevated: #151517;
+  --color-bg-hover: #1C1C1F;
+  --color-divider: #242427;
+  --color-text-main: #E8E8EA;
+  --color-text-muted: #8A8A8E;
+  --color-text-faint: #5A5A5E;
+  --color-accent: #4F9CF9;
+}
+
 body {
   background-color: var(--color-bg);
   color: var(--color-text-main);
@@ -30,8 +41,10 @@ body {
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
   margin: 0;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Base Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -45,4 +58,257 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #3a3a3e;
+}
+
+/* ==========================================================================
+   LIGHT THEME DESIGN SYSTEM (Linear / Vercel Aesthetic)
+   ========================================================================== */
+
+html.light,
+[data-theme="light"],
+body.light {
+  color-scheme: light;
+  --color-bg: #F8FAFC;
+  --color-bg-elevated: #FFFFFF;
+  --color-bg-hover: #F1F5F9;
+  --color-divider: #E2E8F0;
+  --color-text-main: #0F172A;
+  --color-text-muted: #475569;
+  --color-text-faint: #64748B;
+  --color-accent: #2563EB;
+}
+
+/* Light Theme Scrollbars */
+html.light ::-webkit-scrollbar-track,
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+html.light ::-webkit-scrollbar-thumb,
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+}
+html.light ::-webkit-scrollbar-thumb:hover,
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Background Color Overrides in Light Theme */
+html.light .bg-\[\#0E0E10\],
+[data-theme="light"] .bg-\[\#0E0E10\],
+body.light .bg-\[\#0E0E10\] {
+  background-color: #F8FAFC !important;
+}
+
+html.light .bg-\[\#151517\],
+[data-theme="light"] .bg-\[\#151517\],
+body.light .bg-\[\#151517\] {
+  background-color: #FFFFFF !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+}
+
+html.light .bg-\[\#1C1C1F\],
+[data-theme="light"] .bg-\[\#1C1C1F\],
+body.light .bg-\[\#1C1C1F\] {
+  background-color: #F1F5F9 !important;
+}
+
+html.light .bg-\[\#242427\],
+[data-theme="light"] .bg-\[\#242427\] {
+  background-color: #E2E8F0 !important;
+}
+
+/* Hover Backgrounds */
+html.light .hover\:bg-\[\#151517\]:hover,
+[data-theme="light"] .hover\:bg-\[\#151517\]:hover {
+  background-color: #F1F5F9 !important;
+}
+
+html.light .hover\:bg-\[\#1C1C1F\]:hover,
+[data-theme="light"] .hover\:bg-\[\#1C1C1F\]:hover {
+  background-color: #E2E8F0 !important;
+}
+
+html.light .hover\:bg-\[\#242427\]:hover,
+[data-theme="light"] .hover\:bg-\[\#242427\]:hover {
+  background-color: #E2E8F0 !important;
+}
+
+/* Borders & Dividers */
+html.light .border-\[\#242427\],
+[data-theme="light"] .border-\[\#242427\],
+body.light .border-\[\#242427\],
+html.light .border-b-\[\#242427\],
+[data-theme="light"] .border-b-\[\#242427\],
+html.light .border-t-\[\#242427\],
+[data-theme="light"] .border-t-\[\#242427\],
+html.light .border-l-\[\#242427\],
+[data-theme="light"] .border-l-\[\#242427\],
+html.light .border-r-\[\#242427\],
+[data-theme="light"] .border-r-\[\#242427\],
+html.light .border-r-\[\#242427\]\/60,
+[data-theme="light"] .border-r-\[\#242427\]\/60 {
+  border-color: #E2E8F0 !important;
+}
+
+html.light .hover\:border-\[\#3a3a3e\]:hover,
+[data-theme="light"] .hover\:border-\[\#3a3a3e\]:hover {
+  border-color: #CBD5E1 !important;
+}
+
+html.light .divide-\[\#242427\] > :not([hidden]) ~ :not([hidden]),
+[data-theme="light"] .divide-\[\#242427\] > :not([hidden]) ~ :not([hidden]) {
+  border-color: #E2E8F0 !important;
+}
+
+/* Typography & Text */
+html.light .text-\[\#E8E8EA\],
+[data-theme="light"] .text-\[\#E8E8EA\],
+body.light .text-\[\#E8E8EA\] {
+  color: #0F172A !important;
+}
+
+html.light .hover\:text-\[\#E8E8EA\]:hover,
+[data-theme="light"] .hover\:text-\[\#E8E8EA\]:hover {
+  color: #0F172A !important;
+}
+
+html.light .text-\[\#8A8A8E\],
+[data-theme="light"] .text-\[\#8A8A8E\],
+body.light .text-\[\#8A8A8E\] {
+  color: #475569 !important;
+}
+
+html.light .text-\[\#5A5A5E\],
+[data-theme="light"] .text-\[\#5A5A5E\],
+body.light .text-\[\#5A5A5E\] {
+  color: #64748B !important;
+}
+
+html.light .group-hover\:text-\[\#8A8A8E\]:hover,
+[data-theme="light"] .group-hover\:text-\[\#8A8A8E\]:hover {
+  color: #334155 !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder,
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder,
+html.light .placeholder-\[\#5A5A5E\]::placeholder,
+[data-theme="light"] .placeholder-\[\#5A5A5E\]::placeholder {
+  color: #94A3B8 !important;
+}
+
+/* Inputs & Form Controls in Light Mode */
+html.light input,
+html.light textarea,
+html.light select,
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  color: #0F172A !important;
+}
+
+/* Community Header Banner in Light Mode */
+html.light .from-blue-950\/40,
+[data-theme="light"] .from-blue-950\/40 {
+  background: linear-gradient(135deg, #EFF6FF 0%, #EEF2FF 50%, #FAF5FF 100%) !important;
+  border-color: #DBEAFE !important;
+}
+
+/* Moderator / Admin Badges in Light Mode */
+html.light .bg-amber-950\/40,
+[data-theme="light"] .bg-amber-950\/40,
+html.light .bg-amber-950\/60,
+[data-theme="light"] .bg-amber-950\/60,
+html.light .bg-amber-950\/30,
+[data-theme="light"] .bg-amber-950\/30 {
+  background-color: #FEF3C7 !important;
+  color: #92400E !important;
+  border-color: #FCD34D !important;
+}
+
+html.light .text-amber-200,
+[data-theme="light"] .text-amber-200,
+html.light .text-amber-300,
+[data-theme="light"] .text-amber-300 {
+  color: #92400E !important;
+}
+
+html.light .text-amber-400,
+[data-theme="light"] .text-amber-400 {
+  color: #B45309 !important;
+}
+
+html.light .border-amber-800\/50,
+[data-theme="light"] .border-amber-800\/50,
+html.light .border-amber-800\/40,
+[data-theme="light"] .border-amber-800\/40 {
+  border-color: #FCD34D !important;
+}
+
+/* Student / User Role Badges in Light Mode */
+html.light .bg-blue-950\/40,
+[data-theme="light"] .bg-blue-950\/40 {
+  background-color: #EFF6FF !important;
+  color: #1D4ED8 !important;
+  border-color: #BFDBFE !important;
+}
+
+html.light .text-blue-300,
+[data-theme="light"] .text-blue-300 {
+  color: #1D4ED8 !important;
+}
+
+html.light .border-blue-800\/50,
+[data-theme="light"] .border-blue-800\/50 {
+  border-color: #BFDBFE !important;
+}
+
+/* Danger / Delete Action in Light Mode */
+html.light .bg-red-950\/30,
+[data-theme="light"] .bg-red-950\/30,
+html.light .bg-red-950\/40,
+[data-theme="light"] .bg-red-950\/40 {
+  background-color: #FEE2E2 !important;
+  color: #B91C1C !important;
+  border-color: #FCA5A5 !important;
+}
+
+html.light .text-red-300,
+[data-theme="light"] .text-red-300 {
+  color: #B91C1C !important;
+}
+
+html.light .border-red-800\/40,
+[data-theme="light"] .border-red-800\/40,
+html.light .border-red-800\/50,
+[data-theme="light"] .border-red-800\/50 {
+  border-color: #FCA5A5 !important;
+}
+
+/* Success Badges in Light Mode */
+html.light .bg-emerald-950\/40,
+[data-theme="light"] .bg-emerald-950\/40 {
+  background-color: #ECFDF5 !important;
+  color: #047857 !important;
+  border-color: #A7F3D0 !important;
+}
+
+html.light .text-emerald-300,
+[data-theme="light"] .text-emerald-300 {
+  color: #047857 !important;
+}
+
+/* Modals & Command Palette Backdrop in Light Mode */
+html.light .bg-black\/60,
+html.light .bg-black\/70,
+[data-theme="light"] .bg-black\/60,
+[data-theme="light"] .bg-black\/70 {
+  background-color: rgba(15, 23, 42, 0.45) !important;
+}
+
+/* Toast Cards in Light Mode */
+html.light .shadow-xl,
+[data-theme="light"] .shadow-xl {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.08) !important;
 }
