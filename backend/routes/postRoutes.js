@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const Post = require("../models/Post");
+<<<<<<< HEAD
 const jwt = require("jsonwebtoken");
 
 const JWT_SECRET = process.env.JWT_SECRET || "devrev_fallback_secret_key";
@@ -74,6 +75,13 @@ const optionalAuth = (req, res, next) => {
  * POST /api/posts
  */
 router.post("/", optionalAuth, async (req, res) => {
+=======
+const { protect, requireAdmin } = require("../middleware/authMiddleware");
+
+// 1. CREATE POST
+// router.post("/", async (req, res) => {
+  router.post("/", protect, async (req, res) => {
+>>>>>>> 8e15754e525f4eb53619fbe81c6d603fed142b61
   try {
     const { title, code, language, tags, author } = req.body;
 
@@ -258,6 +266,7 @@ router.delete("/:id", optionalAuth, async (req, res) => {
       return res.status(401).json({ message: "Unauthorized. Please log in first." });
     }
 
+<<<<<<< HEAD
     // Role check: Only admin can delete (EXP 6)
     if (req.user.role !== "admin") {
       return res.status(403).json({
@@ -275,11 +284,39 @@ router.delete("/:id", optionalAuth, async (req, res) => {
     const initialLen = inMemoryPosts.length;
     inMemoryPosts = inMemoryPosts.filter(
       (p) => p._id !== req.params.id && p.id !== req.params.id
+=======
+// 4. UPDATE POST
+// router.put("/:id", async (req, res) => {
+  router.put("/:id", protect, requireAdmin, async (req, res) => {
+  try {
+    const post = await Post.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+>>>>>>> 8e15754e525f4eb53619fbe81c6d603fed142b61
     );
     if (inMemoryPosts.length === initialLen) {
       return res.status(404).json({ message: "Post not found" });
     }
+<<<<<<< HEAD
     res.status(200).json({ message: "Post deleted successfully by Admin" });
+=======
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// 5. DELETE POST
+// router.delete("/:id", async (req, res) => {
+  router.delete("/:id", protect, requireAdmin, async (req, res) => {
+  try {
+    const post = await Post.findByIdAndDelete(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    res.status(200).json({ message: "Post deleted successfully" });
+>>>>>>> 8e15754e525f4eb53619fbe81c6d603fed142b61
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
