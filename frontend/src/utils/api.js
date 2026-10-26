@@ -3,8 +3,8 @@
  * Handles communication with the Express/Node.js backend on http://localhost:5000
  */
 
-export const API_BASE = "http://localhost:5000/api";
-export const API_URL = API_BASE;
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+export const API_BASE = `${API_URL.replace(/\/+$/, '')}/api`;
 
 // Helper function to get the stored JWT token
 export const getToken = () => localStorage.getItem("devrev_token") || localStorage.getItem("token");

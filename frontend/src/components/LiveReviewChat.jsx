@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { io } from "socket.io-client";
 import { UserContext } from "../context/UserContext";
+import { API_URL } from "../utils/api";
 import { Send, MessageSquare, Zap, User } from "lucide-react";
 
 export default function LiveReviewChat({ postId, currentUser }) {
@@ -24,7 +25,7 @@ export default function LiveReviewChat({ postId, currentUser }) {
 
   useEffect(() => {
     // Connect to the backend WebSocket server
-    const socket = io("http://localhost:5000", {
+    const socket = io(API_URL, {
       transports: ["websocket", "polling"],
     });
     socketRef.current = socket;
