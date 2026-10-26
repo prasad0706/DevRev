@@ -1,6 +1,8 @@
 require("dotenv").config();
 
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -12,24 +14,52 @@ const Post = require("./models/Post");
 
 const app = express();
 
-// ==========================================
-// 1. SECURITY & UTILITY MIDDLEWARES (EXP NO. 5)
-// ==========================================
-app.use(helmet()); // Secure HTTP headers
-app.use(cors()); // Enable Cross-Origin Resource Sharing for React Frontend
-app.use(express.json()); // Parse JSON request bodies
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
 
-// Rate Limiter: Protects against Denial-of-Service (DoS) and brute-force (EXP NO. 5)
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes window
-  max: 300, // Limit each IP to 300 requests per 15 minutes
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 300,
   message: { message: "Too many requests from this IP, please try again later." },
 });
 app.use(limiter);
 
-// ==========================================
-// 2. DATABASE CONNECTION (EXP NO. 4)
-// ==========================================
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log(`⚡ Reviewer connected via WebSocket: ${socket.id}`);
+
+  socket.on("joinReviewRoom", (postId) => {
+    socket.join(postId);
+    console.log(`Socket ${socket.id} joined review room for post: ${postId}`);
+  });
+
+  socket.on("sendReviewMessage", (data) => {
+    if (data.postId) {
+      io.to(data.postId).emit("receiveReviewMessage", data);
+    } else {
+      io.emit("receiveReviewMessage", data);
+    }
+  });
+
+  socket.on("chatMessage", (data) => {
+    io.emit("chatMessage", data);
+    io.emit("receiveReviewMessage", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log(`Reviewer disconnected: ${socket.id}`);
+  });
+});
+
 const MONGO_URI =
   process.env.MONGO_URI || "mongodb://127.0.0.1:27017/devreview_db";
 
@@ -40,7 +70,7 @@ mongoose
   .then(async () => {
     isDbConnected = true;
     console.log("✅ MongoDB Connected successfully!");
-    // Seed initial posts if database is empty
+
     try {
       const count = await Post.countDocuments();
       if (count === 0) {
@@ -50,7 +80,6 @@ mongoose
       console.log("Seed check skipped:", e.message);
     }
 
-    // Ensure legacy non-sparse index on username is cleaned up
     try {
       const userIndexes = await mongoose.connection.db.collection("users").indexes();
       const legacyUsernameIndex = userIndexes.find(
@@ -69,7 +98,6 @@ mongoose
     );
   });
 
-// Seed data function to provide realistic code snippets for peer review
 async function seedSamplePosts() {
   const initialPosts = [
     {
@@ -112,18 +140,15 @@ async function seedSamplePosts() {
   console.log("🌱 Seeded initial peer review code snippets into MongoDB!");
 }
 
-// ==========================================
-// 3. API ROUTES (EXP NO. 4, 5 & 6)
-// ==========================================
-app.use("/api/users", userRoutes); // EXP 5 & 6: Auth, Validation, JWT, RBAC
-app.use("/api/posts", postRoutes); // EXP 4: Full CRUD REST APIs
+app.use("/api/users", userRoutes);
+app.use("/api/posts", postRoutes);
 
-// Root Health Check Route
 app.get("/", (req, res) => {
   res.json({
     status: "online",
-    message: "DevRev REST API Server is running",
+    message: "DevRev REST API Server & Real-Time WebSocket is running",
     database: isDbConnected ? "MongoDB Connected" : "Connecting",
+    websocket: "Socket.IO Active",
     version: "1.0.0",
     endpoints: {
       posts: "/api/posts",
@@ -132,7 +157,6 @@ app.get("/", (req, res) => {
   });
 });
 
-// Centralized Error Handling Middleware (EXP NO. 5)
 app.use((err, req, res, next) => {
   console.error("Centralized Error Handler:", err.stack);
   res.status(err.status || 500).json({
@@ -141,6 +165,6 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 DevRev Backend Server running on http://localhost:${PORT}`);
+server.listen(PORT, () => {
+  console.log(`🚀 DevRev Backend Server & WebSocket running on http://localhost:${PORT}`);
 });

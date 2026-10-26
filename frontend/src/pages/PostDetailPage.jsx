@@ -3,6 +3,7 @@ import { UserContext } from '../context/UserContext';
 import { getPostById, addPostComment, upvotePost } from '../utils/api';
 import LeftSidebar from '../components/LeftSidebar';
 import RightSidebar from '../components/RightSidebar';
+import LiveReviewChat from "../components/LiveReviewChat";
 import CodeViewer from '../components/CodeViewer';
 import UpvoteButton from '../components/UpvoteButton';
 import RefactorModal from '../components/RefactorModal';
@@ -185,7 +186,6 @@ export default function PostDetailPage({ postId = '1', onNavigate, onShowToast }
                 }}
               />
             </div>
-
             <div className="flex items-center justify-between text-xs pt-2 border-t border-[#242427]">
               <UpvoteButton
                 initialVotes={activePost.upvotes || 0}
@@ -200,6 +200,9 @@ export default function PostDetailPage({ postId = '1', onNavigate, onShowToast }
             </div>
           </article>
         )}
+
+        {/* Real-time Collaborative Review Discussion (Socket.IO) */}
+        <LiveReviewChat postId={activePost._id || activePost.id} currentUser={user} />
 
         {/* Comment submission form */}
         <form onSubmit={handleAddComment} className="bg-[#151517] border border-[#242427] rounded-xl p-4 space-y-2">
@@ -237,9 +240,8 @@ export default function PostDetailPage({ postId = '1', onNavigate, onShowToast }
           {comments.map((comment, idx) => (
             <div
               key={comment._id || idx}
-              className={`bg-[#151517] border rounded-xl p-4 space-y-2.5 ${
-                comment.isAccepted ? 'border-[#4CAF6D]/40' : 'border-[#242427]'
-              }`}
+              className={`bg-[#151517] border rounded-xl p-4 space-y-2.5 ${comment.isAccepted ? 'border-[#4CAF6D]/40' : 'border-[#242427]'
+                }`}
             >
               <div className="flex items-center justify-between text-xs text-[#8A8A8E]">
                 <div className="flex items-center gap-1.5">
