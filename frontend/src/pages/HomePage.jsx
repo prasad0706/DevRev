@@ -76,6 +76,10 @@ export default function HomePage({ onNavigate, onShowToast }) {
             if (tab === 'home') setActiveSort('hot');
             else if (tab === 'trending') setActiveSort('hot');
             else if (tab === 'needs-review') setActiveSort('needs-review');
+            else if (tab === 'live-chat') {
+              const targetId = posts[0]?._id || posts[0]?.id || '1';
+              onNavigate('post-detail', targetId);
+            }
           }}
         />
       </div>

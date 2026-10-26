@@ -57,6 +57,20 @@ export default function LeftSidebar({ activeTab = 'home', onSelectTab }) {
           <Bookmark size={16} className={activeTab === 'saved' ? 'text-[#4F9CF9]' : 'text-[#8A8A8E]'} />
           <span>Saved Snippets</span>
         </button>
+
+        <button
+          onClick={() => onSelectTab && onSelectTab('live-chat')}
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left ${activeTab === 'live-chat'
+              ? 'text-[#4F9CF9] bg-[#1C1C1F] font-semibold border-l-2 border-[#4F9CF9]'
+              : 'text-[#8A8A8E] hover:text-[#E8E8EA] hover:bg-[#1C1C1F]'
+            }`}
+        >
+          <MessageSquare size={16} className={activeTab === 'live-chat' ? 'text-[#4F9CF9]' : 'text-[#8A8A8E]'} />
+          <div className="flex items-center justify-between w-full">
+            <span>Live Chat (EXP 8)</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-1"></span>
+          </div>
+        </button>
       </nav>
 
       <div className="h-px bg-[#242427] my-2" />

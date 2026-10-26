@@ -73,16 +73,19 @@ export default function LiveReviewChat({ postId, currentUser }) {
       id: `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
       postId,
       author: senderName,
+      username: senderName,
       text: inputMessage.trim(),
+      message: inputMessage.trim(),
       time: new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       }),
     };
 
-    // Emit real-time message through Socket.IO
+    // Emit real-time message through Socket.IO (EXP NO. 8)
     if (socketRef.current && socketRef.current.connected) {
       socketRef.current.emit("sendReviewMessage", payload);
+      socketRef.current.emit("chatMessage", payload);
     } else {
       // Local fallback if socket temporarily disconnected
       setMessages((prev) => [...prev, payload]);
@@ -155,7 +158,7 @@ export default function LiveReviewChat({ postId, currentUser }) {
               >
                 <div className="flex items-center gap-1.5 text-[10px] text-[#8A8A8E] mb-0.5 px-1">
                   <span className="font-semibold text-[#E8E8EA]">
-                    {msg.author}
+                    {msg.author || msg.username || 'Reviewer'}
                   </span>
                   <span>·</span>
                   <span>{msg.time || "Just now"}</span>

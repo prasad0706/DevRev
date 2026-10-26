@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { UserContext } from '../context/UserContext';
-import { getUserProfile } from '../utils/api';
+import { getUserProfile, testAdminRoute } from '../utils/api';
 import {
   AlertTriangle,
   LogOut,
@@ -10,6 +10,11 @@ import {
   Shield,
   Award,
   Calendar,
+  CheckCircle2,
+  XCircle,
+  Terminal,
+  Key,
+  ShieldAlert,
 } from 'lucide-react';
 
 export default function DashboardPage({ onNavigate }) {
@@ -19,6 +24,8 @@ export default function DashboardPage({ onNavigate }) {
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState(null);
   const [isSwitchingRole, setIsSwitchingRole] = useState(false);
+  const [testResult, setTestResult] = useState(null);
+  const [testingEndpoint, setTestingEndpoint] = useState(null);
 
   // Fetch protected profile only when token exists
   const fetchProfile = async () => {
@@ -47,6 +54,52 @@ export default function DashboardPage({ onNavigate }) {
     const nextRole = isAdmin ? 'user' : 'admin';
     await switchRole(nextRole);
     setIsSwitchingRole(false);
+  };
+
+  // Test Protected Profile API (EXP NO. 5)
+  const handleTestProfile = async () => {
+    setTestingEndpoint('profile');
+    try {
+      const res = await getUserProfile();
+      setTestResult({
+        endpoint: 'GET /api/users/profile',
+        status: 200,
+        data: res,
+        explanation: 'JWT Bearer token was successfully verified by authMiddleware (EXP NO. 5).',
+      });
+    } catch (err) {
+      setTestResult({
+        endpoint: 'GET /api/users/profile',
+        status: err.status || 401,
+        message: err.message,
+        explanation: 'Access Denied: Token missing or invalid (EXP NO. 5).',
+      });
+    } finally {
+      setTestingEndpoint(null);
+    }
+  };
+
+  // Test Admin Route with Role-Based Access Control (EXP NO. 6)
+  const handleTestAdmin = async () => {
+    setTestingEndpoint('admin');
+    try {
+      const res = await testAdminRoute();
+      setTestResult({
+        endpoint: 'GET /api/users/admin-dashboard',
+        status: 200,
+        data: res,
+        explanation: 'Admin authorization verified! User has admin role in JWT (EXP NO. 6).',
+      });
+    } catch (err) {
+      setTestResult({
+        endpoint: 'GET /api/users/admin-dashboard',
+        status: err.status || 403,
+        message: err.message || 'Forbidden: Admin privileges required.',
+        explanation: 'RBAC Active: Regular student rejected with HTTP 403 because role !== "admin" (EXP NO. 6).',
+      });
+    } finally {
+      setTestingEndpoint(null);
+    }
   };
 
   return (
@@ -183,6 +236,71 @@ export default function DashboardPage({ onNavigate }) {
           </div>
         </div>
       )}
+
+      {/* Interactive Lab Viva Evaluation Test Bench (EXP NO. 5 & 6) */}
+      <div className="bg-[#151517] border border-[#242427] rounded-xl p-5 space-y-4">
+        <div className="flex items-center justify-between border-b border-[#242427] pb-3">
+          <div className="flex items-center gap-2">
+            <Terminal size={16} className="text-[#4F9CF9]" />
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#E8E8EA]">
+              Lab Evaluation Test Bench (EXP NO. 5 & 6)
+            </h3>
+          </div>
+          <span className="text-[11px] text-[#8A8A8E] font-mono">
+            {token ? 'Authorization: Bearer <JWT>' : 'No Token'}
+          </span>
+        </div>
+
+        <p className="text-xs text-[#8A8A8E] leading-relaxed">
+          Test JWT authentication and Role-Based Access Control (RBAC). A student token returns{' '}
+          <strong className="text-emerald-400">HTTP 200</strong> on Profile and{' '}
+          <strong className="text-amber-400">HTTP 403 Forbidden</strong> on Admin routes. An Admin token returns{' '}
+          <strong className="text-emerald-400">HTTP 200</strong> on both.
+        </p>
+
+        <div className="flex flex-wrap gap-2.5">
+          <button
+            onClick={handleTestProfile}
+            disabled={testingEndpoint !== null}
+            className="bg-[#1C1C1F] hover:bg-[#242427] border border-[#242427] text-sky-400 text-xs px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 disabled:opacity-50"
+          >
+            <Key size={13} />
+            <span>Test Protected Profile (EXP 5)</span>
+          </button>
+
+          <button
+            onClick={handleTestAdmin}
+            disabled={testingEndpoint !== null}
+            className="bg-[#1C1C1F] hover:bg-[#242427] border border-[#242427] text-amber-300 text-xs px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 disabled:opacity-50"
+          >
+            <ShieldAlert size={13} />
+            <span>Test Admin Route (EXP 6)</span>
+          </button>
+        </div>
+
+        {testResult && (
+          <div className="bg-[#0E0E10] border border-[#242427] rounded-lg p-3 space-y-2 text-xs font-mono">
+            <div className="flex items-center justify-between border-b border-[#242427] pb-1.5">
+              <span className="text-[#8A8A8E]">{testResult.endpoint}</span>
+              <span
+                className={`px-2 py-0.5 rounded text-[11px] font-bold ${
+                  testResult.status === 200
+                    ? 'bg-emerald-950/50 text-emerald-300 border border-emerald-800/50'
+                    : 'bg-amber-950/50 text-amber-300 border border-amber-800/50'
+                }`}
+              >
+                HTTP {testResult.status} {testResult.status === 200 ? 'OK' : 'FORBIDDEN'}
+              </span>
+            </div>
+            <pre className="text-[11px] text-[#E8E8EA] overflow-x-auto p-1 leading-relaxed">
+              {JSON.stringify(testResult.data || { error: testResult.message }, null, 2)}
+            </pre>
+            <p className="text-[11px] text-[#8A8A8E] font-sans pt-1 border-t border-[#242427]">
+              💡 <strong>Viva Note:</strong> {testResult.explanation}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
