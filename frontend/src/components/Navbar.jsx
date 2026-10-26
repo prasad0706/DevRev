@@ -1,98 +1,29 @@
-<<<<<<< HEAD
 import React, { useContext } from 'react';
 import { UserContext } from '../context/UserContext';
 import { useTheme } from '../context/ThemeContext';
-import { Search, Bell, Plus, ShieldCheck, Sun, Moon } from 'lucide-react';
+import { Search, Bell, Plus, ShieldCheck, Sun, Moon, LogOut } from 'lucide-react';
 
 export default function Navbar({ onNavigate, onOpenCommand, onOpenNewPost }) {
-  const { user, toggleModMode } = useContext(UserContext);
-  const { theme, isLight, toggleTheme } = useTheme();
-=======
-import React from "react";
-import { useUser } from "../context/UserContext";
-import { Search, Bell, Plus, ShieldCheck } from "lucide-react";
+  const { user, toggleModMode, logout } = useContext(UserContext);
+  const { isLight, toggleTheme } = useTheme();
 
-export default function Navbar({
-  onNavigate,
-  onOpenCommand,
-  onOpenNewPost,
-}) {
-  const { user, loading, logout } = useUser();
->>>>>>> 8e15754e525f4eb53619fbe81c6d603fed142b61
-
-  // While authentication is being checked
-  if (loading) {
-    return (
-      <header className="sticky top-0 z-40 bg-[#0E0E10] border-b border-[#242427] px-4 py-2.5 flex items-center justify-between">
-        <div
-          onClick={() => onNavigate("home")}
-          className="flex items-center gap-2 cursor-pointer"
-        >
-          <span className="font-semibold text-base tracking-tight text-[#E8E8EA]">
-            Dev<span className="text-[#4F9CF9]">Review</span>
-          </span>
-        </div>
-
-        <div className="text-xs text-[#8A8A8E]">
-          Verifying session...
-        </div>
-      </header>
-    );
-  }
-
-  // No authenticated user
-  if (!user) {
-    return (
-      <header className="sticky top-0 z-40 bg-[#0E0E10] border-b border-[#242427] px-4 py-2.5 flex items-center justify-between">
-        <div
-          onClick={() => onNavigate("home")}
-          className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition"
-        >
-          <span className="font-semibold text-base tracking-tight text-[#E8E8EA]">
-            Dev<span className="text-[#4F9CF9]">Review</span>
-          </span>
-        </div>
-
-        <button
-          onClick={() => onNavigate("login")}
-          className="bg-[#4F9CF9] hover:bg-[#3b82f6] text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition"
-        >
-          Login
-        </button>
-      </header>
-    );
-  }
-
-  const initials = user.username
-    ? user.username
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    : user.name
+  const initials = user?.name
     ? user.name
-        .split(" ")
+        .split(' ')
         .map((n) => n[0])
-        .join("")
+        .join('')
         .toUpperCase()
         .slice(0, 2)
-    : "U";
-
-  const isAdmin = user.role === "admin";
+    : user?.username
+    ? user.username.slice(0, 2).toUpperCase()
+    : 'PM';
 
   const isModActive = Boolean(user?.isModMode || user?.role === 'admin');
 
   return (
-<<<<<<< HEAD
     <header className={`sticky top-0 z-40 ${isLight ? 'bg-white/95 border-[#E2E8F0] shadow-xs' : 'bg-[#0E0E10] border-[#242427]'} border-b px-4 py-2.5 flex items-center justify-between backdrop-blur-md transition-colors duration-200`}>
-=======
-    <header className="sticky top-0 z-40 bg-[#0E0E10] border-b border-[#242427] px-4 py-2.5 flex items-center justify-between">
-      
-      {/* Logo */}
->>>>>>> 8e15754e525f4eb53619fbe81c6d603fed142b61
       <div
-        onClick={() => onNavigate("home")}
+        onClick={() => onNavigate('home')}
         className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition"
       >
         <span className="font-semibold text-base tracking-tight text-[#E8E8EA]">
@@ -100,32 +31,17 @@ export default function Navbar({
         </span>
       </div>
 
-      {/* Search */}
       <div
         onClick={onOpenCommand}
         className={`hidden md:flex items-center ${isLight ? 'bg-[#F1F5F9] border-[#E2E8F0] hover:border-[#CBD5E1]' : 'bg-[#151517] border-[#242427] hover:border-[#3a3a3e]'} border rounded-lg px-3 py-1.5 w-80 text-xs cursor-pointer transition`}
       >
-<<<<<<< HEAD
         <Search size={14} className="text-[#8A8A8E] mr-2 shrink-0" />
         <span className="text-[#8A8A8E] flex-1">Search topics, code, or authors...</span>
         <kbd className={`font-sans text-[10px] ${isLight ? 'text-[#64748B] bg-white border-[#CBD5E1]' : 'text-[#5A5A5E] bg-[#0E0E10] border-[#242427]'} border px-1.5 py-0.5 rounded`}>
-=======
-        <Search
-          size={14}
-          className="text-[#8A8A8E] mr-2 shrink-0"
-        />
-
-        <span className="text-[#8A8A8E] flex-1">
-          Search topics, code, or authors...
-        </span>
-
-        <kbd className="font-sans text-[10px] text-[#5A5A5E] bg-[#0E0E10] border border-[#242427] px-1.5 py-0.5 rounded">
->>>>>>> 8e15754e525f4eb53619fbe81c6d603fed142b61
           ⌘K
         </kbd>
       </div>
 
-<<<<<<< HEAD
       <div className="flex items-center gap-2 sm:gap-3">
         <button
           onClick={toggleModMode}
@@ -178,38 +94,14 @@ export default function Navbar({
           )}
         </button>
 
-=======
-      {/* Right side */}
-      <div className="flex items-center gap-3">
-
-        {/* Admin indicator */}
-        {isAdmin && (
-          <div
-            className="px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 border bg-amber-950/40 text-amber-300 border-amber-800/50"
-            title="Administrator"
-          >
-            <ShieldCheck
-              size={16}
-              className="text-amber-400"
-            />
-
-            <span className="hidden sm:inline">
-              Admin
-            </span>
-          </div>
-        )}
-
-        {/* Notifications */}
->>>>>>> 8e15754e525f4eb53619fbe81c6d603fed142b61
         <button
-          onClick={() => onNavigate("home")}
+          onClick={() => onNavigate('home')}
           className="p-1.5 text-[#8A8A8E] hover:text-[#E8E8EA] rounded-lg hover:bg-[#151517] transition"
           title="Notifications"
         >
           <Bell size={18} />
         </button>
 
-        {/* New post */}
         <button
           onClick={onOpenNewPost}
           className="bg-[#4F9CF9] hover:bg-[#3b82f6] text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-xs"
@@ -218,7 +110,6 @@ export default function Navbar({
           <span>Post Code</span>
         </button>
 
-<<<<<<< HEAD
         {user ? (
           <div className="flex items-center gap-2">
             <span
@@ -238,9 +129,16 @@ export default function Navbar({
             <button
               onClick={() => onNavigate('dashboard')}
               className={`w-7 h-7 rounded-full ${isLight ? 'bg-[#F1F5F9] border-[#E2E8F0] text-[#0F172A]' : 'bg-[#151517] border-[#242427] text-[#E8E8EA]'} border hover:border-[#4F9CF9] flex items-center justify-center text-xs font-semibold transition`}
-              title={`Logged in as ${user?.name || 'User'} (${user?.role || 'user'})`}
+              title={`Logged in as ${user?.name || user?.username || 'User'} (${user?.role || 'user'})`}
             >
               {initials}
+            </button>
+            <button
+              onClick={logout}
+              className="text-xs text-[#8A8A8E] hover:text-red-400 p-1 transition"
+              title="Logout"
+            >
+              <LogOut size={15} />
             </button>
           </div>
         ) : (
@@ -251,28 +149,6 @@ export default function Navbar({
             Sign In
           </button>
         )}
-=======
-        {/* Profile */}
-        <button
-          onClick={() => onNavigate("dashboard")}
-          className="w-7 h-7 rounded-full bg-[#151517] border border-[#242427] hover:border-[#4F9CF9] flex items-center justify-center text-xs font-semibold text-[#E8E8EA] transition"
-          title={`Logged in as ${
-            user.username || user.name || "User"
-          } (${user.role})`}
-        >
-          {initials}
-        </button>
-
-        {/* Logout */}
-        <button
-          onClick={logout}
-          className="text-xs text-[#8A8A8E] hover:text-red-400 transition"
-          title="Logout"
-        >
-          Logout
-        </button>
-
->>>>>>> 8e15754e525f4eb53619fbe81c6d603fed142b61
       </div>
     </header>
   );

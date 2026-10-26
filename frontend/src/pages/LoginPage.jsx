@@ -7,7 +7,6 @@ export default function LoginPage({ onNavigate }) {
   const { login, quickDemoLogin } = useContext(UserContext);
   const [email, setEmail] = useState('prasad@devreview.io');
   const [password, setPassword] = useState('password123');
-<<<<<<< HEAD
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -81,74 +80,6 @@ export default function LoginPage({ onNavigate }) {
         </div>
 
         {/* Standard Email/Password Form */}
-=======
-  const [error, setError] = useState("");
-const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState("");
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  setError("");
-  setLoading(true);
-
-  try {
-    const response = await fetch(
-      "http://localhost:5000/api/users/login",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      setError(
-        data.message || "Invalid email or password"
-      );
-      return;
-    }
-
-    // Save JWT
-    localStorage.setItem("token", data.token);
-
-    // Save authenticated user
-    login(data.user);
-
-    onNavigate("dashboard");
-  } catch (error) {
-    console.error("Login error:", error);
-
-    setError(
-      "Unable to connect to the server."
-    );
-  } finally {
-    setLoading(false);
-  }
-};
-
-  return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
-      <div className="bg-[#151517] border border-[#242427] rounded-xl p-6 w-full max-w-sm shadow-xl">
-        <h2 className="text-xl font-bold text-[#E8E8EA] text-center mb-1">Welcome Back</h2>
-        <p className="text-[#8A8A8E] text-xs text-center mb-5">
-          Login to review peer code & earn developer Karma
-        </p>
-{error && (
-  <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2">
-    <p className="text-xs text-red-400">
-      {error}
-    </p>
-  </div>
-)}
->>>>>>> 8e15754e525f4eb53619fbe81c6d603fed142b61
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div>
             <label className="block text-xs font-medium text-[#8A8A8E] mb-1">

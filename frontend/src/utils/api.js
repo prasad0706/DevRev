@@ -1,30 +1,23 @@
-<<<<<<< HEAD
 /**
  * DevRev API Client Utility
  * Handles communication with the Express/Node.js backend on http://localhost:5000
  */
 
-const API_BASE = "http://localhost:5000/api";
+export const API_BASE = "http://localhost:5000/api";
+export const API_URL = API_BASE;
 
 // Helper function to get the stored JWT token
-export const getToken = () => localStorage.getItem("devrev_token");
+export const getToken = () => localStorage.getItem("devrev_token") || localStorage.getItem("token");
 
 // Helper function to make authenticated or public API requests
 export async function apiRequest(endpoint, options = {}) {
   const token = getToken();
-=======
-const API_URL = "http://localhost:5000/api";
-
-export const apiRequest = async (endpoint, options = {}) => {
-  const token = localStorage.getItem("token");
->>>>>>> 8e15754e525f4eb53619fbe81c6d603fed142b61
 
   const headers = {
     "Content-Type": "application/json",
     ...(options.headers || {}),
   };
 
-<<<<<<< HEAD
   // Attach Bearer token for protected routes (EXP NO. 5 & 6)
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -113,22 +106,3 @@ export const getUserProfile = () => apiRequest("/users/profile");
 
 // 4. Test Admin Privileges (RBAC - EXP NO. 6)
 export const testAdminRoute = () => apiRequest("/users/admin-dashboard");
-=======
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Request failed");
-  }
-
-  return data;
-};
->>>>>>> 8e15754e525f4eb53619fbe81c6d603fed142b61
