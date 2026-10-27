@@ -67,7 +67,7 @@ export default function LeftSidebar({ activeTab = 'home', onSelectTab }) {
         >
           <MessageSquare size={16} className={activeTab === 'live-chat' ? 'text-[#4F9CF9]' : 'text-[#8A8A8E]'} />
           <div className="flex items-center justify-between w-full">
-            <span>Live Chat (EXP 8)</span>
+            <span>Live Chat</span>
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-1"></span>
           </div>
         </button>

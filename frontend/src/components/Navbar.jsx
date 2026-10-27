@@ -27,7 +27,7 @@ export default function Navbar({ onNavigate, onOpenCommand, onOpenNewPost }) {
         className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition"
       >
         <span className="font-semibold text-base tracking-tight text-[#E8E8EA]">
-          Dev<span className="text-[#4F9CF9]">Review</span>
+          Dev<span className="text-[#4F9CF9]">Rev</span>
         </span>
       </div>
 
