@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Flame, CheckCircle2, Bookmark } from 'lucide-react';
+import { Home, Flame, CheckCircle2, Bookmark, MessageSquare } from 'lucide-react';
 
 export default function LeftSidebar({ activeTab = 'home', onSelectTab }) {
   const topics = [
@@ -17,8 +17,8 @@ export default function LeftSidebar({ activeTab = 'home', onSelectTab }) {
         <button
           onClick={() => onSelectTab && onSelectTab('home')}
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left ${activeTab === 'home'
-              ? 'text-[#4F9CF9] bg-[#1C1C1F] font-semibold border-l-2 border-[#4F9CF9]'
-              : 'text-[#8A8A8E] hover:text-[#E8E8EA] hover:bg-[#1C1C1F]'
+            ? 'text-[#4F9CF9] bg-[#1C1C1F] font-semibold border-l-2 border-[#4F9CF9]'
+            : 'text-[#8A8A8E] hover:text-[#E8E8EA] hover:bg-[#1C1C1F]'
             }`}
         >
           <Home size={16} className={activeTab === 'home' ? 'text-[#4F9CF9]' : 'text-[#8A8A8E]'} />
@@ -28,8 +28,8 @@ export default function LeftSidebar({ activeTab = 'home', onSelectTab }) {
         <button
           onClick={() => onSelectTab && onSelectTab('trending')}
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left ${activeTab === 'trending'
-              ? 'text-[#4F9CF9] bg-[#1C1C1F] font-semibold border-l-2 border-[#4F9CF9]'
-              : 'text-[#8A8A8E] hover:text-[#E8E8EA] hover:bg-[#1C1C1F]'
+            ? 'text-[#4F9CF9] bg-[#1C1C1F] font-semibold border-l-2 border-[#4F9CF9]'
+            : 'text-[#8A8A8E] hover:text-[#E8E8EA] hover:bg-[#1C1C1F]'
             }`}
         >
           <Flame size={16} className={activeTab === 'trending' ? 'text-[#4F9CF9]' : 'text-[#8A8A8E]'} />
@@ -39,8 +39,8 @@ export default function LeftSidebar({ activeTab = 'home', onSelectTab }) {
         <button
           onClick={() => onSelectTab && onSelectTab('needs-review')}
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left ${activeTab === 'needs-review'
-              ? 'text-[#4F9CF9] bg-[#1C1C1F] font-semibold border-l-2 border-[#4F9CF9]'
-              : 'text-[#8A8A8E] hover:text-[#E8E8EA] hover:bg-[#1C1C1F]'
+            ? 'text-[#4F9CF9] bg-[#1C1C1F] font-semibold border-l-2 border-[#4F9CF9]'
+            : 'text-[#8A8A8E] hover:text-[#E8E8EA] hover:bg-[#1C1C1F]'
             }`}
         >
           <CheckCircle2 size={16} className={activeTab === 'needs-review' ? 'text-[#4F9CF9]' : 'text-[#8A8A8E]'} />
@@ -50,8 +50,8 @@ export default function LeftSidebar({ activeTab = 'home', onSelectTab }) {
         <button
           onClick={() => onSelectTab && onSelectTab('saved')}
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left ${activeTab === 'saved'
-              ? 'text-[#4F9CF9] bg-[#1C1C1F] font-semibold border-l-2 border-[#4F9CF9]'
-              : 'text-[#8A8A8E] hover:text-[#E8E8EA] hover:bg-[#1C1C1F]'
+            ? 'text-[#4F9CF9] bg-[#1C1C1F] font-semibold border-l-2 border-[#4F9CF9]'
+            : 'text-[#8A8A8E] hover:text-[#E8E8EA] hover:bg-[#1C1C1F]'
             }`}
         >
           <Bookmark size={16} className={activeTab === 'saved' ? 'text-[#4F9CF9]' : 'text-[#8A8A8E]'} />
@@ -61,8 +61,8 @@ export default function LeftSidebar({ activeTab = 'home', onSelectTab }) {
         <button
           onClick={() => onSelectTab && onSelectTab('live-chat')}
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left ${activeTab === 'live-chat'
-              ? 'text-[#4F9CF9] bg-[#1C1C1F] font-semibold border-l-2 border-[#4F9CF9]'
-              : 'text-[#8A8A8E] hover:text-[#E8E8EA] hover:bg-[#1C1C1F]'
+            ? 'text-[#4F9CF9] bg-[#1C1C1F] font-semibold border-l-2 border-[#4F9CF9]'
+            : 'text-[#8A8A8E] hover:text-[#E8E8EA] hover:bg-[#1C1C1F]'
             }`}
         >
           <MessageSquare size={16} className={activeTab === 'live-chat' ? 'text-[#4F9CF9]' : 'text-[#8A8A8E]'} />

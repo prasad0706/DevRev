@@ -43,7 +43,7 @@ export default function LoginPage({ onNavigate }) {
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-8">
       <div className="bg-[#151517] border border-[#242427] rounded-xl p-6 w-full max-w-md shadow-2xl space-y-5">
         <div className="text-center">
-          <h2 className="text-xl font-bold text-[#E8E8EA]">Sign In to DevReview</h2>
+          <h2 className="text-xl font-bold text-[#E8E8EA]">Sign In to DevRev</h2>
           <p className="text-[#8A8A8E] text-xs mt-1">
             Sign in to review peer code, submit refactors, and earn karma.
           </p>

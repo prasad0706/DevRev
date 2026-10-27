@@ -91,7 +91,7 @@ export default function HomePage({ onNavigate, onShowToast }) {
           <div className="flex items-center gap-2.5">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <div>
-              <span className="text-[#E8E8EA] font-semibold block">DevReview Community Feed</span>
+              <span className="text-[#E8E8EA] font-semibold block">DevRev Community Feed</span>
               <span className="text-[#8A8A8E] text-[11px]">Peer code reviews, refactor suggestions, and developer karma</span>
             </div>
           </div>
